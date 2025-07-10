@@ -29,7 +29,7 @@ def init() -> GameState:
         models = {},
         grass = rl.load_model("models/grass2.vox"),
         dirt = rl.load_model("models/grass_block.vox"),
-        block_size = rl.get_model_bounding_box(self.grass).max.x,
+        block_size = rl.get_model_bounding_box(self.dirt).max.x,
 
 
 
