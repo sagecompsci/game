@@ -108,9 +108,9 @@ def vector3_subtract(v1: rl.Vector3, v2: rl.Vector3) -> rl.Vector3:
 def vector3_angle(v1: rl.Vector3, v2: rl.Vector3):
     result = 0
     cross: rl.Vector3 = rl.Vector3(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x)
-    len = math.sqrt(cross.x*cross.x + cross.y*cross.y + cross.z*cross.z)
+    length = math.sqrt(cross.x*cross.x + cross.y*cross.y + cross.z*cross.z)
     dot = (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z)
-    result = math.atan2(len, dot)
+    result = math.atan2(length, dot)
 
     return result;
 
@@ -165,7 +165,7 @@ def camera_move_forward(camera: rl.Camera3D, distance: float, move_in_world_plan
     camera.target = vector3_add(camera.target, forward)
 
 
-def update_camera(camera: rl.Camera3D, model: dict, block_size: float):
+def update_camera(camera: rl.Camera3D):
     camera_move_speed = 1
     camera_rotation_speed = .03
     camera_pan_speed = .2
