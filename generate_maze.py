@@ -1,73 +1,10 @@
-from heapq import merge
-
 import pyray as rl
-from dataclasses import dataclass
 import random
 
+import utilities as u
+from my_dataclasses import GameState, Tile, Entity
+from monsters import monster_data
 
-@dataclass
-class Tile:
-    pos: rl.Vector2
-    rotate_pos: rl.Vector2
-    rotation: int
-    texture: rl.Texture
-    tile: str
-    directions: list[str]
-
-@dataclass
-class GameState:
-    tile_size: int
-    maze_size: int
-    textures: dict
-    camera: rl.Camera2D
-
-def init():
-    rl.init_window(1800, 900, "Maze")
-    state = GameState(
-        tile_size= 24,
-        maze_size= 100,
-        textures = {},
-        camera = rl.Camera2D (),
-    )
-
-    state.camera.offset = rl.Vector2(0, 0)
-    state.camera.target = rl.Vector2(0, 0)
-    state.camera.rotation = 0
-    state.camera.zoom = 1
-
-    textures = [
-        "one",
-        "two",
-        "two_c",
-        "three",
-        "four",
-        "none",
-    ]
-
-    for texture in textures:
-        state.textures[texture] = rl.load_texture(f"images/{texture}.png")
-
-    return state
-
-def str_v2(string: str) -> rl.Vector2:
-    x, y = string.split(",")
-    return rl.Vector2(int(x), int(y))
-
-def v2_str(v2: rl.Vector2) -> str:
-    return f"{v2.x},{v2.y}"
-
-def pos_from_direction(state: GameState, direction: str, pos: rl.Vector2) -> rl.Vector2:
-    pos2 = rl.Vector2(pos.x, pos.y)
-    if direction == "north":
-        pos2.y -= state.tile_size
-    elif direction == "south":
-        pos2.y += state.tile_size
-    elif direction == "east":
-        pos2.x += state.tile_size
-    elif direction == "west":
-        pos2.x -= state.tile_size
-
-    return pos2
 
 def rotate(state: GameState, pos: rl.Vector2, rotation: int) -> rl.Vector2:
     if rotation == 90:
@@ -160,7 +97,7 @@ def check_directions(state: GameState, maze: dict, pos: rl.Vector2) -> tuple[lis
             pos2.y -= state.tile_size
             direction = "north"
 
-        pos2_str = v2_str(rl.Vector2(pos2.x, pos2.y))
+        pos2_str = u.v2_str(rl.Vector2(pos2.x, pos2.y))
         if pos2_str in maze.keys():
             opposite = get_opposite_direction(direction)
             if opposite in maze[pos2_str].directions:
@@ -180,22 +117,22 @@ def get_index(paths: list[dict], key: str) -> int:
 
 def get_current_path(state: GameState, paths: list[dict], pos: rl.Vector2, directions: list[str]) -> tuple[list[dict], int]:
     if len(directions) == 2:
-        north = pos_from_direction(state, "north", rl.Vector2(pos.x, pos.y))
-        west = pos_from_direction(state, "west", rl.Vector2(pos.x, pos.y))
-        north_index = get_index(paths, v2_str(rl.Vector2(north.x, north.y)))
-        west_index = get_index(paths, v2_str(rl.Vector2(west.x, west.y)))
+        north = u.pos_from_direction(state.tile_size, "north", rl.Vector2(pos.x, pos.y))
+        west = u.pos_from_direction(state.tile_size, "west", rl.Vector2(pos.x, pos.y))
+        north_index = get_index(paths, u.v2_str(rl.Vector2(north.x, north.y)))
+        west_index = get_index(paths, u.v2_str(rl.Vector2(west.x, west.y)))
 
         if north_index != west_index:
             paths[north_index].update(paths[west_index])
             paths.pop(west_index)
-            north_index = get_index(paths, v2_str(rl.Vector2(north.x, north.y)))
+            north_index = get_index(paths, u.v2_str(rl.Vector2(north.x, north.y)))
 
 
         index = north_index
 
     elif len(directions) == 1:
-        pos2 = pos_from_direction(state, f"{directions[0]}", rl.Vector2(pos.x, pos.y))
-        index = get_index(paths, v2_str(rl.Vector2(pos2.x, pos2.y)))
+        pos2 = u.pos_from_direction(state.tile_size, f"{directions[0]}", rl.Vector2(pos.x, pos.y))
+        index = get_index(paths, u.v2_str(rl.Vector2(pos2.x, pos2.y)))
 
     else:
         index = -1
@@ -217,7 +154,7 @@ def get_directions(state: GameState, maze: dict, pos: rl.Vector2, paths: list[di
     else:
         create_new_path = True
 
-    current_key = v2_str(rl.Vector2(pos.x, pos.y))
+    current_key = u.v2_str(rl.Vector2(pos.x, pos.y))
     path = {current_key: list(directions)}
     if create_new_path:
         paths.append(path)
@@ -228,7 +165,7 @@ def get_directions(state: GameState, maze: dict, pos: rl.Vector2, paths: list[di
 
     if not create_new_path:
         for direction in directions:
-            prev_key = v2_str(pos_from_direction(state, direction, rl.Vector2(pos.x, pos.y)))
+            prev_key = u.v2_str(u.pos_from_direction(state.tile_size, direction, rl.Vector2(pos.x, pos.y)))
             opposite = get_opposite_direction(direction)
             if opposite in current_path[prev_key]:
                 current_path[current_key].remove(direction)
@@ -253,93 +190,90 @@ def get_directions(state: GameState, maze: dict, pos: rl.Vector2, paths: list[di
 
         if len(current_path[current_key]) == 0:
             current_path.pop(current_key)
-
-    # print()
-    # print()
-    # print("PATH")
-    # print(current_key)
-    # print("current path")
-    # for prev_key, value in current_path.items():
-    #     print()
-    #     print(f"{prev_key}", end=" ")
-    #     for direction in value:
-    #         print(direction, end=" ")
-    # print()
-    # print("all paths")
-    # for path in paths:
-    #     print()
-    #     print("new path")
-    #     for key, value in path.items():
-    #         print(f"{key}", end=" ")
-    #         for direction in value:
-    #             print(direction, end=" ")
-    #
     return directions, paths
 
-def create_tile(state: GameState, maze: dict, pos: rl.Vector2, paths: list[dict], directions: list[str] = None) -> tuple[Tile, list[dict]]:
+def create_tile(state: GameState, maze: dict, pos: rl.Vector2, paths: list[dict], dead_ends: list[rl.Vector2],
+                directions: list[str] = None) -> tuple[Tile, list[dict], list[rl.Vector2]]:
+
     if directions is None:
         directions, paths = get_directions(state, maze, pos, paths)
 
     tile = get_tile(directions)
+    if tile == "one":
+        dead_ends.append(rl.Vector2(pos.x, pos.y))
     rotation = get_rotation(tile, directions)
     rotate_pos = rotate(state, rl.Vector2(pos.x, pos.y), rotation)
-    texture = state.textures[tile]
 
 
     tile = Tile (
         pos = pos,
         rotate_pos = rotate_pos,
         rotation = rotation,
-        texture = texture,
         tile = tile,
         directions = directions,
     )
-    return tile, paths
+    return tile, paths, dead_ends
 
-def create_maze(state: GameState) -> dict:
+def generate_chests_monsters(state: GameState, dead_ends: list, maze: dict) -> tuple[dict, dict]:
+    chests = {}
+    monsters = {}
+
+    # Chests and Minotaurs in front of chests
+    for i in range(state.maze_size//2):
+        pos = random.choice(dead_ends)
+        dead_ends.remove(pos)
+
+        gold = random.randint(10, 20)
+        chests[u.v2_str(rl.Vector2(pos.x, pos.y))] = gold
+
+        key = u.v2_str(rl.Vector2(pos.x, pos.y))
+        monster_pos = u.pos_from_direction(state.tile_size, maze[key].directions[0], rl.Vector2(pos.x, pos.y))
+        new_key = u.v2_str(rl.Vector2(monster_pos.x, monster_pos.y))
+
+        if new_key in state.monsters.keys():
+            directions = maze[new_key].directions
+            for direction in directions:
+                monster_pos = u.pos_from_direction(state.tile_size, direction, rl.Vector2(monster_pos.x, monster_pos.y))
+                new_key = u.v2_str(rl.Vector2(monster_pos.x, monster_pos.y))
+                if new_key in state.monsters.keys():
+                    break
+
+        monster_name = "minotaur"
+        monsters[new_key] = u.create_entity(monster_name)
+
+
+    # Gargoyles
+    # count = state.maze_size//2
+    count = 40
+    while count > 0:
+        key = random.choice(list(maze.keys()))
+        if not key in monsters.keys() and not key in chests.keys():
+            count -= 1
+            monsters[key] = u.create_entity("gargoyle")
+
+
+
+
+
+    return chests, monsters
+
+
+def create_maze(state: GameState) -> tuple[dict, rl.Vector2, dict, dict]:
     maze = {}
     paths = []
+    dead_ends = []
     for y in range(state.maze_size):
         for x in range(state.maze_size):
-            tile, paths = create_tile(state, maze, rl.Vector2(x * state.tile_size, y * state.tile_size), paths)
+            tile, paths, dead_ends = create_tile(state, maze, rl.Vector2(x * state.tile_size, y * state.tile_size), paths, dead_ends)
 
-            string = v2_str(tile.pos)
+            string = u.v2_str(tile.pos)
             maze[string] = tile
 
+    start_pos = random.choice(dead_ends)
+    dead_ends.remove(start_pos)
+    maze[u.v2_str(rl.Vector2(start_pos.x, start_pos.y))].tile = "stair"
 
-    return maze
-
-
-def draw_maze(state: GameState, maze: dict):
-    for tile in maze.values():
-        rl.draw_texture_ex(tile.texture, tile.rotate_pos, tile.rotation, state.tile_size // 8, rl.WHITE)
-
-def main():
-    state = init()
-    maze = create_maze(state)
-
-    while not rl.window_should_close():
-        speed = 5
-        if rl.is_key_down(rl.KeyboardKey.KEY_W):
-            state.camera.target.y -= speed
-        if rl.is_key_down(rl.KeyboardKey.KEY_S):
-            state.camera.target.y += speed
-        if rl.is_key_down(rl.KeyboardKey.KEY_D):
-            state.camera.target.x += speed
-        if rl.is_key_down(rl.KeyboardKey.KEY_A):
-            state.camera.target.x -= speed
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_Z):
-            state.camera.zoom += 1
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_X):
-            state.camera.zoom -= 1
+    chests, monsters = generate_chests_monsters(state, dead_ends, maze)
 
 
-        rl.begin_drawing()
-        rl.clear_background(rl.WHITE)
-        rl.begin_mode_2d(state.camera)
-        draw_maze(state, maze)
-
-        rl.end_mode_2d()
-        rl.end_drawing()
-
-main()
+    return maze, start_pos, chests, monsters
