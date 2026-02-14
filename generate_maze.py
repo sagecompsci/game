@@ -1,9 +1,9 @@
 import pyray as rl
 import random
+from data.weapons import weapon_data
 
 import utilities as u
-from my_dataclasses import GameState, Tile, Entity
-from monsters import monster_data
+from my_dataclasses import GameState, Tile
 
 
 def rotate(state: GameState, pos: rl.Vector2, rotation: int) -> rl.Vector2:
@@ -223,8 +223,8 @@ def generate_chests_monsters(state: GameState, dead_ends: list, maze: dict) -> t
         pos = random.choice(dead_ends)
         dead_ends.remove(pos)
 
-        gold = random.randint(10, 20)
-        chests[u.v2_str(rl.Vector2(pos.x, pos.y))] = gold
+        item = random.choice(list(weapon_data.keys()))
+        chests[u.v2_str(rl.Vector2(pos.x, pos.y))] = item
 
         key = u.v2_str(rl.Vector2(pos.x, pos.y))
         monster_pos = u.pos_from_direction(state.tile_size, maze[key].directions[0], rl.Vector2(pos.x, pos.y))
@@ -243,8 +243,7 @@ def generate_chests_monsters(state: GameState, dead_ends: list, maze: dict) -> t
 
 
     # Gargoyles
-    # count = state.maze_size//2
-    count = 40
+    count = state.maze_size//2
     while count > 0:
         key = random.choice(list(maze.keys()))
         if not key in monsters.keys() and not key in chests.keys():

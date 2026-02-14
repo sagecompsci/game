@@ -1,30 +1,51 @@
 import pyray as rl
 import pickle
-from my_dataclasses import GameState, Tile, Entity, Button
-from monsters import monster_data
+from my_dataclasses import GameState, Tile, Entity, InventoryItem
+from data.monster import monster_data
 
 
 
 def str_v2(string: str) -> rl.Vector2:
-    pos_x, pos_y = string.split(",")
-    x = pos_x.split(".")[0]
-    y = pos_y.split(".")[0]
-
-    return rl.Vector2(int(x), int(y))
+    # pos_x, pos_y = string.split(",")
+    # x = pos_x.split(".")[0]
+    # y = pos_y.split(".")[0]
+    #
+    # return rl.Vector2(int(x), int(y))
+    x, y = string.split(",")
+    return rl.Vector2(float(x), float(y))
 
 def v2_str(v2: rl.Vector2) -> str:
     return f"{v2.x},{v2.y}"
 
-def is_next_to(tile_size: int, v1: rl.Vector2, v2: rl.Vector2) -> bool:
-    x_diff = v1.x - v2.x
-    y_diff = v1.y - v2.y
+def center_text(font: rl.Font, text: str, font_size: float, spacing: float, pos: rl.Vector2, width: float, height: float) -> rl.Vector2:
+    text_pos = rl.Vector2(0, 0)
+    size = rl.measure_text_ex(font, text, font_size, spacing)
+    text_pos.x = (width//2) - (size.x//2) + pos.x
+    text_pos.y = (height//2) - (size.y//2) + pos.y
 
-    if (x_diff == tile_size or x_diff == -tile_size) and y_diff == 0:
-        return True
-    if (y_diff == tile_size or y_diff == -tile_size) and x_diff == 0:
-        return True
+    return text_pos
 
-    return False
+
+def add_to_inventory(state: GameState, item_name: str, inv_name: str, item_type: str, count: int):
+    inventory = state.inventory[inv_name]
+
+    if item_name in inventory.keys():
+        inventory[item_name].count += count
+    else:
+        inventory[item_name] = InventoryItem(
+            count = count,
+            type = item_type,
+        )
+
+def remove_from_inventory(state: GameState, item_name: str, inv_name: str, count: int):
+    inventory = state.inventory[inv_name.split(" ")[0]]
+    if item_name in inventory.keys():
+        if inventory[item_name].count == count:
+            inventory.pop(item_name)
+        else:
+            inventory[item_name].count -= count
+
+
 
 def pos_from_direction(tile_size: int, direction: str, pos: rl.Vector2) -> rl.Vector2:
     pos2 = rl.Vector2(pos.x, pos.y)
@@ -49,7 +70,7 @@ def save(state: GameState):
             maze[key] = (value.pos.x, value.pos.y, value.rotate_pos.x, value.rotate_pos.y, value.rotation, value.tile, value.directions)
 
         p = state.player
-        player = (p.pos.x, p.pos.y, p.image, p.level, p.xp, p.health, p.max_health)
+        player = (p.pos.x, p.pos.y, p.image, p.health, p.max_health, p.defense, p.strength, p.attack_speed, p.speed, p.last_attack)
         save_data = {
             "save": state.save,
             "player": player,
@@ -72,8 +93,10 @@ def load(name: str, state: GameState):
         data = read_file(name)[0]
         state.save = data["save"]
 
-        (state.player.pos.x, state.player.pos.y, state.player.image, state.player.level, state.player.xp,
-         state.player.health, state.player.max_health) = data["player"]
+        p = state.player
+        p.pos.x, p.pos.y, p.image, p.health, p.max_health, p.defense, p.strength, p.attack_speed, p.speed, p.last_attack = data["player"]
+
+        # (state.player.pos.x, state.player.pos.y, state.player.image, state.player.health, state.player.max_health) = data["player"]
 
         state.inventory = data["inventory"]
         state.gold = data["gold"]
@@ -98,13 +121,28 @@ def load(name: str, state: GameState):
 def create_entity(name: str) -> Entity:
     monster = monster_data[name]
     return Entity(
-        name=monster.name,
-        image=name,
-        health=monster.health,
-        max_health=monster.max_health,
-        defense=monster.defense,
-        attack=monster.attack,
-        speed=monster.speed,
-        drops=monster.drops,
-        locations=monster.locations
+        name = monster.name,
+        image = name,
+        health = monster.health,
+        max_health = monster.health,
+        defense = monster.defense,
+        strength = monster.strength,
+        attack_speed = monster.attack_speed,
+        speed = monster.speed,
+        last_attack = 0,
+        stats = monster.stats,
+        drops = monster.drops,
+        locations = monster.locations,
     )
+
+
+# def is_next_to(tile_size: int, v1: rl.Vector2, v2: rl.Vector2) -> bool:
+#     x_diff = v1.x - v2.x
+#     y_diff = v1.y - v2.y
+#
+#     if (x_diff == tile_size or x_diff == -tile_size) and y_diff == 0:
+#         return True
+#     if (y_diff == tile_size or y_diff == -tile_size) and x_diff == 0:
+#         return True
+#
+#     return False

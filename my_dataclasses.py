@@ -15,22 +15,31 @@ class Entity:
 
     defense: int
 
-    attack: int
+    strength: int
+
+    attack_speed: int
 
     speed: int
 
-    drops: list[str]
+    last_attack: int
+
+    stats: dict
+
+    drops: dict
 
     locations: list[str]
     """
     name: str
     image: str
-    health: int
-    max_health: int
-    defense: int
-    attack: int
-    speed: int
-    drops: list[str]
+    health: float
+    max_health: float
+    defense: float
+    strength: float
+    attack_speed: float
+    speed: float
+    last_attack: int
+    stats: dict
+    drops: dict
     locations: list[str]
 
 @dataclass
@@ -42,29 +51,42 @@ class Player:
 
     health: int
 
-    level: int
-
-    xp: int
-
-    health: int
-
     max_health: int
 
     defense: int
 
-    attack: int
+    strength: int
+
+    attack_speed: int
 
     speed: int
+
+    last_attack: int
+
+    bonus_health: int
+
+    bonus_defense: int
+
+    bonus_strength: int
+
+    bonus_attack_speed: int
+
+    bonus_speed: int
     """
     pos: rl.Vector2
     image: str
-    level: int
-    xp: int
     health: int
     max_health: int
     defense: int
-    attack: int
+    strength: int
+    attack_speed: int
     speed: int
+    last_attack: int
+    bonus_health: int
+    bonus_defense: int
+    bonus_strength: int
+    bonus_attack_speed: int
+    bonus_speed: int
 
 
 @dataclass
@@ -72,10 +94,10 @@ class InventoryItem:
     """
     count: int
 
-    item: tuple
+    type: str
     """
     count: int
-    item: tuple
+    type: str
 
 @dataclass
 class GameState:
@@ -90,11 +112,15 @@ class GameState:
 
     gold: int
 
+    level: str
+
     maze: dict
 
     chests: dict
 
-    monsters: dict
+    maze_monsters: dict
+
+    village_monsters: dict
 
     tile_size: int
 
@@ -107,6 +133,8 @@ class GameState:
     time: int
 
     menu: str
+
+    inv_view: str
     """
     save: str
     player: Player
@@ -116,12 +144,14 @@ class GameState:
     maze: dict
     chests: dict
     monsters: dict
+    village_monsters: dict
     tile_size: int
     maze_size: int
     textures: dict
     camera: rl.Camera2D
     time: int
     menu: str
+    inv_view: str
 
 @dataclass
 class Tile:

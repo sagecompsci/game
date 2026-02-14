@@ -150,36 +150,3 @@ def draw_pause_menu(textures, buttons: list[Button]):
         rl.draw_texture_ex(textures[button.type], button.pos, 0, button.scale, rl.WHITE)
         rl.draw_text(button.text, int(button.text_pos.x), int(button.text_pos.y), 9 * scale, rl.WHITE)
 
-def draw_inventory(textures: dict, inventory: dict, gold: int):
-    inv_scale = scale * 5
-    inv_width = 73 * inv_scale
-    inv_height = 73 * inv_scale
-    inv_pos = rl.Vector2(x_center_screen(inv_width), y_center_screen(inv_height))
-
-    gold_scale = inv_scale//3
-    gold_width = 64 * gold_scale
-    gold_height = 16 * gold_scale
-    gold_pos = rl.Vector2(inv_pos.x, inv_pos.y - gold_height - (2 * gold_scale))
-
-    rl.draw_texture_ex(textures["blank_button"], (gold_pos.x, gold_pos.y), 0, gold_scale, rl.WHITE)
-    rl.draw_text(str(gold) + " G", int(gold_pos.x + 2 * gold_scale), int(gold_pos.y + 2 * gold_scale), 12 * gold_scale, rl.WHITE)
-
-
-    item_width = 8 * inv_scale
-    pos = rl.Vector2(inv_pos.x + inv_scale, inv_pos.y + inv_scale)
-    text_offset = inv_scale //2
-
-    rl.draw_texture_ex(textures["inventory"],(inv_pos.x, inv_pos.y) , 0, inv_scale, rl.WHITE)
-
-
-    for key, value in inventory.items():
-        image = key
-        count = value.count
-
-        rl.draw_texture_ex(textures[image], (pos.x, pos.y), 0, inv_scale, rl.WHITE)
-        rl.draw_text(str(count), int(pos.x + text_offset), int(pos.y + text_offset), 4 * inv_scale, rl.BLACK)
-
-        pos.x += item_width + inv_scale
-        if pos.x > inv_width:
-            pos.x = inv_pos.x + inv_scale
-            pos.y += item_width + inv_scale
