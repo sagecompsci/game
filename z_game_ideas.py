@@ -2,8 +2,32 @@ def nothing(): pass
 
 """
 to-do
-    - eventually organize code
+    - create npcs
+    - create quests
+    - generate village
+    - create shops
+    - create simple version of journal
+    - key items tab
+    - symbols for tabs instead of words
+    
+    - wake up by a silver tree.
+    - after you get certain number of tiles away you come across an injured centaur
+        - gives you quest, their caravan was attacked by a pack of wolves and they need help
+        - they ask you to go to the nearest village and find help, village shows up on map, and they give you directions
+        - centaurs gives you flint, wood, and some food
+    - once you get to village you talk to guards and tell them what happened
+    - you go with the guards back to the centaur camp
+    - the healer gives another quest to ask if you can gather some materials
+    - healer gives you recipe for medicinal brew
+    - if you don't accept the first quest everyone dies
+    - if you don't accept the second quest some die
 
+
+general 
+    - floors are in upside pyramid, floors get smaller as you go down
+    - the tower is the world tree, the levels are the branches that get bigger as you go up
+    - eventually there is extra content, another pyramid that are the roots
+        - can be accessed when you choose wish from tree
 
 monsters
     - monsters respawn in the morning?? or at night or something
@@ -77,14 +101,12 @@ inventory
     if hovering then description_item = key
         get json object(key)
 
-
-minimap
-    - only shows where you have walked
-    - basic map
-        - given by default. in black and white. only shows general landmarks and not exact
-    - fairy map
-        - if you meet a fairy npc and talk to her she asks if she can come with you. she draws map of every tile everywhere
-            you have been. Fairy has always loved maps and adventure, but is too weak to survive on her own
+map
+    - starter map only shows very zoomed out and only shows landmarks
+    - can buy maps of more detail in villages.
+    - each map is on a new page of the journal. maps sometimes take up both sides of the journal. can't zoom in, have to
+        move to the zoomed in map page
+    
 
 chalk
     - can draw arrows on stone
@@ -92,6 +114,8 @@ mirror
     - can see around corners if you are on the tile next to a corner
 compass 
     - shows direction you are facing
+hammer
+    - allows you to craft simple items in your inventory
 
 journal
     - stores information about items and monsters that you have seen
@@ -109,10 +133,16 @@ journal
 alchemy
     - npc somewhere that says he is going to the city to learn alchemy, if you do quest he gives you book of recipes
     - create potions. different ways to process ingredients lead to slightly different potions or length of effects
+    - maybe too many potions has negative side effect
     
 maybe cooking?
-    - like alchemy but different tools and processes
-    
+    - cooking can have better effects but food must be eaten very quickly
+    - some foods like jerky can last longer
+    - must create a campfire with sticks and flint, flint is a key item that you get from centaurs
+
+crafting
+    - crafting tab
+    - only shows recipes that can be crafted without special equipment
  
 random
     - karma is accumulated by quests and doing good things, bad things give negative karma
@@ -171,7 +201,6 @@ levels
     forest floor (roots of the world tree)
 
     final floor
-        - world tree is growing upside down at the tip of the pyramid
         - world tree grants you a wish. cutscenes play based on your choice and your stats gold and karma
             - general 
                 - evil karma become a villain, depending on stats and gold you could destroy the world
@@ -193,8 +222,10 @@ levels
             - fame
             - eternal life
             - nothing
+            - more adventure
+                - unlocks next part
+                - option after you make a wish when you enter the save, something about being able to choose the more adventure option
 
-https://comicvine.gamespot.com/profile/decept_o/lists/animals-creatures-and-monster-characters-from-folk/56033/?page=2
 
 npcs
     any

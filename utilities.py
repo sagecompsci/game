@@ -1,21 +1,74 @@
+import os
 import pyray as rl
-import pickle
-from my_dataclasses import GameState, Tile, Entity, InventoryItem
-from data.monster import monster_data
+from my_dataclasses import Entity, InventoryItem
 
+from data.armor import armor_data, Armor
+from data.bracelets import bracelet_data, Bracelet
+from data.items import item_data, Item
+from data.monsters import monster_data, Monster
+from data.necklaces import necklace_data, Necklace
+from data.rings import ring_data, Ring
+from data.weapons import weapon_data, Weapon
+
+
+from collections import namedtuple
+
+def get_data(item_name: str, item_type: str) -> Armor | Bracelet | Item | Monster | Necklace | Ring | Weapon:
+    item_type = item_type.split(" ")[0]
+    data = []
+    if item_type == "armor":
+        data = armor_data[item_name]
+    elif item_type == "bracelets":
+        data = bracelet_data[item_name]
+    elif item_type == "items":
+        data = item_data[item_name]
+    elif item_type == "monsters":
+        data = monster_data[item_name]
+    elif item_type == "necklaces":
+        data = necklace_data[item_name]
+    elif item_type == "rings":
+        data = ring_data[item_name]
+    elif item_type == "weapons":
+        data = weapon_data[item_name]
+
+    return data
+
+def get_files(path: str) -> dict:
+    textures = {}
+    files = os.listdir(path)
+    for file in files:
+        new_path = path + "/" + file
+        if os.path.isfile(new_path):
+            name = file.split(".")[0]
+            textures[name] = rl.load_texture(new_path)
+        elif os.path.isdir(new_path):
+            textures.update(get_files(new_path))
+
+    return textures
 
 
 def str_v2(string: str) -> rl.Vector2:
-    # pos_x, pos_y = string.split(",")
-    # x = pos_x.split(".")[0]
-    # y = pos_y.split(".")[0]
-    #
-    # return rl.Vector2(int(x), int(y))
     x, y = string.split(",")
     return rl.Vector2(float(x), float(y))
 
 def v2_str(v2: rl.Vector2) -> str:
     return f"{v2.x},{v2.y}"
+
+def print_v2(pos: rl.Vector2):
+    print(f"{pos.x}, {pos.y}")
+
+
+
+def rotate(tile_size: int, pos: rl.Vector2, rotation: int) -> rl.Vector2:
+    if rotation == 90:
+        pos.x += tile_size
+    elif rotation == 180:
+        pos.y += tile_size
+        pos.x += tile_size
+    elif rotation == 270:
+        pos.y += tile_size
+
+    return pos
 
 def center_text(font: rl.Font, text: str, font_size: float, spacing: float, pos: rl.Vector2, width: float, height: float) -> rl.Vector2:
     text_pos = rl.Vector2(0, 0)
@@ -25,10 +78,17 @@ def center_text(font: rl.Font, text: str, font_size: float, spacing: float, pos:
 
     return text_pos
 
+def x_center_screen(width: int) -> int:
+    center = rl.get_screen_width()//2
+    return center - (width//2)
 
-def add_to_inventory(state: GameState, item_name: str, inv_name: str, item_type: str, count: int):
-    inventory = state.inventory[inv_name]
+def y_center_screen(height: int) -> int:
+    center = rl.get_screen_height()//2
+    return center - (height//2)
 
+
+
+def add_to_inventory(inventory: dict, item_name: str, item_type: str, count: int):
     if item_name in inventory.keys():
         inventory[item_name].count += count
     else:
@@ -37,8 +97,7 @@ def add_to_inventory(state: GameState, item_name: str, inv_name: str, item_type:
             type = item_type,
         )
 
-def remove_from_inventory(state: GameState, item_name: str, inv_name: str, count: int):
-    inventory = state.inventory[inv_name.split(" ")[0]]
+def remove_from_inventory(inventory: dict, item_name: str, count: int):
     if item_name in inventory.keys():
         if inventory[item_name].count == count:
             inventory.pop(item_name)
@@ -60,64 +119,6 @@ def pos_from_direction(tile_size: int, direction: str, pos: rl.Vector2) -> rl.Ve
 
     return pos2
 
-def print_v2(pos: rl.Vector2):
-    print(f"{pos.x}, {pos.y}")
-
-def save(state: GameState):
-    with open(f"saves/{state.save}.pickle", "wb") as f:
-        maze = {}
-        for key, value in state.maze.items():
-            maze[key] = (value.pos.x, value.pos.y, value.rotate_pos.x, value.rotate_pos.y, value.rotation, value.tile, value.directions)
-
-        p = state.player
-        player = (p.pos.x, p.pos.y, p.image, p.health, p.max_health, p.defense, p.strength, p.attack_speed, p.speed, p.last_attack)
-        save_data = {
-            "save": state.save,
-            "player": player,
-            "inventory": state.inventory,
-            "gold": state.gold,
-            "maze": maze,
-            "monsters": state.monsters,
-            "chests": state.chests,
-            "time": state.time,
-        }
-        pickle.dump([save_data], f, 2)
-
-    print("saved")
-
-def read_file(name: str):
-    with open(f"saves/{name}.pickle", "rb") as f:
-        return pickle.load(f)
-
-def load(name: str, state: GameState):
-        data = read_file(name)[0]
-        state.save = data["save"]
-
-        p = state.player
-        p.pos.x, p.pos.y, p.image, p.health, p.max_health, p.defense, p.strength, p.attack_speed, p.speed, p.last_attack = data["player"]
-
-        # (state.player.pos.x, state.player.pos.y, state.player.image, state.player.health, state.player.max_health) = data["player"]
-
-        state.inventory = data["inventory"]
-        state.gold = data["gold"]
-
-
-        maze = data["maze"]
-        for key, value in maze.items():
-           state.maze[key] = Tile (
-               pos = rl.Vector2(value[0], value[1]),
-               rotate_pos = rl.Vector2(value[2], value[3]),
-               rotation = value[4],
-               tile = value[5],
-               directions = value[6],
-           )
-
-        state.monsters = data["monsters"]
-        state.chests = data["chests"]
-        state.time = data["time"]
-
-        state.camera.target = rl.Vector2(state.player.pos.x, state.player.pos.y)
-
 def create_entity(name: str) -> Entity:
     monster = monster_data[name]
     return Entity(
@@ -136,13 +137,3 @@ def create_entity(name: str) -> Entity:
     )
 
 
-# def is_next_to(tile_size: int, v1: rl.Vector2, v2: rl.Vector2) -> bool:
-#     x_diff = v1.x - v2.x
-#     y_diff = v1.y - v2.y
-#
-#     if (x_diff == tile_size or x_diff == -tile_size) and y_diff == 0:
-#         return True
-#     if (y_diff == tile_size or y_diff == -tile_size) and x_diff == 0:
-#         return True
-#
-#     return False

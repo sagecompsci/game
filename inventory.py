@@ -1,5 +1,5 @@
 import pyray as rl
-from my_dataclasses import InventoryItem, GameState
+from my_dataclasses import Player
 from data.items import item_data
 from data.weapons import weapon_data
 from data.armor import armor_data
@@ -78,17 +78,17 @@ def draw_text(text: str, font_size: float, pos: rl.Vector2):
     centered = u.center_text(font, text, font_size, spacing, rl.Vector2(pos.x, pos.y), description_width, 0)
     rl.draw_text_ex(font, text, centered, font_size, spacing, rl.BLACK)
 
-def draw_stats(state: GameState):
+def draw_stats(player: Player, gold: int):
     size = rl.measure_text_ex(font, "Test", font_size, spacing)
     font_height = size.y
 
-    p = state.player
+    p = player
     health = f"Health: {math.trunc(p.health)} / {math.trunc(p.max_health)} (+{math.trunc(p.bonus_health)})"
     defense = f"Defense: {math.trunc(p.defense)} (+{math.trunc(p.bonus_defense)})"
     strength = f"Strength: {math.trunc(p.strength)} (+{math.trunc(p.bonus_strength)})"
     attack_speed = f"Attack Speed: {math.trunc(p.attack_speed)} (+{math.trunc(p.bonus_attack_speed)})"
     speed = f"Speed: {math.trunc(p.speed)} (+{math.trunc(p.bonus_speed)})"
-    gold = f"{state.gold} Gold"
+    gold = f"{gold} Gold"
 
     stats = [health, defense, strength, attack_speed, speed, gold]
     pos = rl.Vector2(stat_pos.x, stat_pos.y)
@@ -98,10 +98,10 @@ def draw_stats(state: GameState):
         pos.y += font_height + border//2
 
 
-def draw_equips(state: GameState, desc_item: str, mouse: rl.Vector2, textures: dict, equips: dict) -> str:
+def draw_equips(player: Player, gold: int, inventory: dict, desc_item: str, mouse: rl.Vector2, textures: dict, equips: dict) -> str:
     remove_name = ""
     rl.draw_texture_ex(textures["equips"], equips_pos, 0, scale, rl.WHITE)
-    draw_stats(state)
+    draw_stats(player, gold)
 
     types = {"weapons": weapon_pos, "armor head": head_pos, "armor chest": chest_pos, "armor legs": leg_pos, "armor feet": feet_pos,
              "necklaces": necklace_pos, "bracelets": bracelet_pos, "rings": ring_pos}
@@ -127,13 +127,12 @@ def draw_equips(state: GameState, desc_item: str, mouse: rl.Vector2, textures: d
 
     if remove_name != "":
         item_type = equips[remove_name].type
-        u.add_to_inventory(state, remove_name, item_type.split(" ")[0], item_type, 1)
-        u.remove_from_inventory(state, remove_name, "equips", 1)
-        # state.inventory["equips"].pop(remove_name)
+        u.add_to_inventory(inventory[item_type.split(" ")[0]], remove_name, item_type, 1)
+        u.remove_from_inventory(inventory["equips"], remove_name, 1)
 
     return desc_item
 
-def draw_items(state: GameState, desc_item: str, mouse: rl.Vector2, textures: dict, items: dict) -> str:
+def draw_items(player: Player, inventory: dict, desc_item: str, mouse: rl.Vector2, textures: dict, items: dict) -> str:
     remove_name = ""
     rl.draw_texture_ex(textures["items"], items_pos, 0, scale, rl.WHITE)
 
@@ -141,7 +140,7 @@ def draw_items(state: GameState, desc_item: str, mouse: rl.Vector2, textures: di
     for key, value in items.items():
         if pos.x <= mouse.x <= pos.x + img_size and pos.y <= mouse.y <= pos.y + img_size:
             desc_item = f"{key}"
-            if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_RIGHT) and value.type != "item":
+            if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_RIGHT) and value.type != "items":
                 remove_name = key
 
 
@@ -161,14 +160,20 @@ def draw_items(state: GameState, desc_item: str, mouse: rl.Vector2, textures: di
             pos.y += img_size + item_margin
 
     if remove_name != "":
+        add = True
         value = items[remove_name]
+        data = u.get_data(remove_name, value.type)
+
+        for stat, num in data.requirements.items():
+            if player.__getattribute__(stat) < num:
+                add = False
+
+
 
         types = {"armor head": 1, "armor chest": 1, "armor legs": 1, "armor feet": 1,
                  "weapons": 1, "necklaces": 1, "bracelets": 2, "rings": 7}
-        equips = [item for item in state.inventory["equips"].values()]
 
-        count = [item.count for item in state.inventory["equips"].values() if item.type == value.type]
-        add = True
+        count = [item.count for item in inventory["equips"].values() if item.type == value.type]
         if count:
             total = 0
             for num in count:
@@ -177,8 +182,8 @@ def draw_items(state: GameState, desc_item: str, mouse: rl.Vector2, textures: di
                 add = False
 
         if add:
-            u.add_to_inventory(state, remove_name, "equips", value.type, 1)
-            u.remove_from_inventory(state, remove_name, value.type, 1)
+            u.add_to_inventory(inventory["equips"], remove_name, value.type, 1)
+            u.remove_from_inventory(inventory[value.type.split(" ")[0]], remove_name, 1)
 
     return desc_item
 
@@ -242,13 +247,15 @@ def draw_inv_buttons(mouse: rl.Vector2, textures: dict, types: list[str], inv_vi
 
     return view
 
-def draw_inventory(state: GameState, textures: dict, inventory: dict, gold: int):
+def draw_inventory(player: Player, inventory:dict, gold: int, textures: dict, inv_view: str) -> str:
     desc_item = ""
     mouse = rl.get_mouse_position()
 
-    desc_item = draw_equips(state, desc_item, mouse, textures, inventory["equips"])
-    desc_item = draw_items(state, desc_item, mouse, textures, inventory[state.inv_view])
+    desc_item = draw_equips(player, gold, inventory, desc_item, mouse, textures, inventory["equips"])
+    desc_item = draw_items(player, inventory, desc_item, mouse, textures, inventory[inv_view])
 
-    state.inv_view = draw_inv_buttons(mouse, textures, ["weapons", "armor", "necklaces", "bracelets", "rings", "items"], state.inv_view)
+    inv_view = draw_inv_buttons(mouse, textures, ["weapons", "armor", "necklaces", "bracelets", "rings", "items"], inv_view)
 
     draw_description(textures, desc_item)
+
+    return inv_view
