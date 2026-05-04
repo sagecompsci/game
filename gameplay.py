@@ -6,6 +6,7 @@ import utilities as u
 from save import save
 import inventory
 import movement
+import journal
 
 
 
@@ -28,10 +29,11 @@ def equip_effects(state: GameState):
 
 
 def draw(view: dict, textures: dict[str, rl.Texture], player_pos: rl.Vector2, tile_size, scale: int):
-    for key, tile in view["tiles"].items():
+    for key, tiles in view["tiles"].items():
         pos = u.str_v2(key)
-        pos = u.rotate(tile_size, rl.Vector2(pos.x, pos.y), tile.rotation)
-        rl.draw_texture_ex(textures[tile.name], pos, tile.rotation, scale, rl.WHITE)
+        for tile in tiles:
+            pos = u.rotate(tile_size, rl.Vector2(pos.x, pos.y), tile.rotation)
+            rl.draw_texture_ex(textures[tile.name], pos, tile.rotation, scale, rl.WHITE)
 
     chests = view["chests"]
     for key in chests.keys():
@@ -46,22 +48,38 @@ def draw(view: dict, textures: dict[str, rl.Texture], player_pos: rl.Vector2, ti
 
     rl.draw_texture_ex(textures["player"], player_pos, 0, scale, rl.WHITE)
 
-def draw_player_health(state: GameState):
-    p = state.player
-    width = rl.get_screen_width()//4
-    height = rl.get_screen_height()//12
-    pos = rl.Vector2(u.x_center_screen(width), rl.get_screen_height() - height - 10)
-    rl.draw_rectangle(int(pos.x), int(pos.y), width, height, rl.BLACK)
-    total_health = math.trunc(p.max_health) + math.trunc(p.bonus_health)
-    health_width = (width/total_health) * p.health
-    rl.draw_rectangle(int(pos.x), int(pos.y), int(health_width), height, rl.RED)
+def draw_player_health(font: rl.Font, textures: dict[str, rl.Texture], health: int, max_health: int):
+    scale = 8
+    pos = rl.Vector2(5 * scale, 5 * scale)
+    health_pos = rl.Vector2(pos.x + 1 * scale, pos.y + 1 * scale)
+    health_size = rl.Vector2(64 * scale, 7 * scale)
 
-    font = rl.get_font_default()
-    text = f"{math.trunc(p.health)} / {math.trunc(p.max_health + math.trunc(p.bonus_health))}"
-    font_size = height // 2
+    #Draw health/damage bar
+    if health < max_health:
+        rl.draw_texture_ex(textures["player_damage"], (health_pos.x, health_pos.y), 0, scale, rl.WHITE )
+        width = 62 * scale
+        height = 5 * scale
+        percent = health / max_health
+        new_width = width * percent
+        rl.draw_texture_pro(textures["player_health"], (0, 0, new_width, height),
+                            (health_pos.x, health_pos.y, new_width, height), (0, 0), 0, rl.WHITE)
+
+    else:
+        rl.draw_texture_ex(textures["player_health"], (health_pos.x, health_pos.y), 0, scale, rl.WHITE)
+
+    # Draw Health Bar Border
+    rl.draw_texture_ex(textures["player_health_bar"], (pos.x, pos.y), 0, scale, rl.WHITE)
+
+    # Draw Health numbers
+    font_size = scale * 4
     spacing = 1
-    text_pos = u.center_text(font, text, font_size, spacing, rl.Vector2(pos.x, pos.y), width, height)
-    rl.draw_text_ex(font, text, text_pos, font_size, spacing, rl.BLACK)
+    color = rl.WHITE
+    health_text = f"{math.trunc(health)} / {math.trunc(max_health)}"
+    text_size = rl.measure_text_ex(font, health_text, font_size, spacing)
+    text_pos = rl.Vector2(pos.x + health_size.x//2 - text_size.x//2, pos.y + health_size.y//2 - (text_size.y//3))
+    rl.draw_text_ex(font, health_text, text_pos, font_size, spacing, color)
+
+
 
 def draw_monster_health(tile_size: int, scale, monster: Entity, key: str):
     width = tile_size
@@ -77,14 +95,23 @@ def game_loop(state: GameState):
     if rl.is_key_pressed(rl.KeyboardKey.KEY_E):
         if state.menu == "":
             state.menu = "inventory"
-        elif state.menu == "inventory":
+        elif state.menu in ("inventory", "journal"):
+            state.menu = ""
+
+    if rl.is_key_pressed(rl.KeyboardKey.KEY_F):
+        if state.menu == "":
+            state.menu = "journal"
+        elif state.menu == "journal":
             state.menu = ""
 
     elif rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
-        state.menu = "pause"
+        if state.menu in ("journal", "inventory"):
+            state.menu = ""
+        else:
+            state.menu = "pause"
 
-    if rl.is_key_pressed(rl.KeyboardKey.KEY_F):
-        p.health = p.max_health + p.bonus_health
+    if rl.is_key_pressed(rl.KeyboardKey.KEY_G):
+        p.health = p.max_health
 
     state.time += 1
 
@@ -99,18 +126,15 @@ def game_loop(state: GameState):
 
     if state.menu == "":
         movement.open_chest(state.inventory, state.view, p.pos)
-        movement.fight_monster(state.inventory, p, state.view["monsters"], state.view, state.tile_size, state.time)
+        movement.fight_monster(state.inventory, p, state.view["monsters"], state.view, state.tile_size, state.time,
+                               state.kills, state.active_quests, state.completed_quests)
+
 
         if state.time - state.last_movement > p.speed * 10:
             state.last_movement = state.time
             state.view, state.location = movement.update_movement(p, state.view, state.buildings, state.levels, state.level, state.location, state.tile_size)
             state.camera.target = rl.Vector2(p.pos.x, p.pos.y)
             # keep track of last time of movement, if greater than 7 then walk
-
-        # print()
-        # u.print_v2(p.pos)
-        # for direction in state.view["tiles"][u.v2_str(rl.Vector2(p.pos.x, p.pos.y))].directions:
-        #     print(direction)
 
 
 
@@ -126,8 +150,14 @@ def game_loop(state: GameState):
 
 
     rl.end_mode_2d()
-    draw_player_health(state)
+
+    draw_player_health(state.font, state.textures, state.player.health + state.player.bonus_health, state.player.max_health + state.player.bonus_health)
     if state.menu == "inventory":
-        state.inv_view = inventory.draw_inventory(state.player, state.inventory, state.gold, state.textures, state.inv_view)
+        state.inv_view, is_journal = inventory.draw_inventory(state.font, state.font_size, state.player, state.inventory, state.gold, state.textures, state.inv_view)
+        if is_journal:
+            state.menu = "journal"
+
+    if state.menu == "journal":
+        state.journal_tab_view = journal.draw_journal(state.textures, state.journal_tab_view, state.font, state.kills, state.active_quests, state.completed_quests)
 
     rl.end_drawing()

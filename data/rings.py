@@ -4,6 +4,14 @@ Ring = namedtuple("Ring", ["name", "description", "type", "effects", "requiremen
 item_type = "rings"
 
 ring_data = {
+    "dandelion_ring": Ring(
+        name = "Dandelion Ring",
+        description = "A beautiful ring made with grass and a dandelion.",
+        type = item_type,
+        effects = {"strength": 1},
+        requirements = {"health": 5},
+        locations = ["crafting"]
+    ),
     "ring_one": Ring(
         name = "Ring Two",
         description = "This is the first ring.",

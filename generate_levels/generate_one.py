@@ -43,10 +43,11 @@ def create_tile(pos: rl.Vector2, name: str, tile_size: int, start: rl.Vector2, e
         key = u.v2_str(u.pos_from_direction(tile_size, direction, rl.Vector2(pos.x, pos.y)))
 
         if key in level.keys():
-            if opposite in level[key].directions:
+            if opposite in level[key][0].directions:
                 directions.append(direction)
-        elif not key in building_tiles:
+        else:
             directions.append(direction)
+
 
         # if key_west in level.keys():
         #     directions.append("west")
@@ -59,57 +60,45 @@ def create_tile(pos: rl.Vector2, name: str, tile_size: int, start: rl.Vector2, e
         # if pos.y != end.y:
         #     directions.append("south")
 
-    images = [image.split(".")[0] for image in os.listdir("images/tiles") if image.split(".")[0].split("_")[0] == name]
 
     return Tile (
         rotation = 0,
-        name = random.choice(images),
+        name = name,
         directions = directions,
     )
 
 
-def create_building(pos: rl.Vector2, tile_size: int, biome: str, level: dict) -> tuple[Tile, list[str], dict[str, dict]]:
+def create_building(pos: rl.Vector2, tile_size: int, level: dict) -> tuple[Tile, list[str], dict[str, dict]]:
     width = 3
     height = 3
-    tiles = []
-    door = ""
+    key = u.v2_str(pos)
+    door = key
+    tiles = [key]
 
-    building_types = ["tent",] #"shop", "house"]
-    building_type = random.choice(building_types)
-    name = f"{biome}_{building_type}"
-    count = len(os.listdir(f"images/building/one/{biome}/{building_type}"))
-    building_num = random.randint(1, count)
-
-    # layout = layout_data[random.choice(list(layout_data.keys()))]
+    if key in level.keys():
+        level[key][0].directions = ["south"]
 
 
+    key_north = u.v2_str(u.pos_from_direction(tile_size, "north", rl.Vector2(pos.x, pos.y)))
+    key_west = u.v2_str(u.pos_from_direction(tile_size, "west", rl.Vector2(pos.x, pos.y)))
 
-    for y in range(height):
-        for x in range(width):
-            pos2 = rl.Vector2(x * tile_size + pos.x, y * tile_size + pos.y)
-            key = u.v2_str(rl.Vector2(pos2.x, pos2.y))
-            if y + 1 == 3 and x + 1 == 2:
-                door = key
-            tiles.append(key)
 
-            key_north = u.v2_str(u.pos_from_direction(tile_size, "north", rl.Vector2(pos2.x, pos2.y)))
-            key_west = u.v2_str(u.pos_from_direction(tile_size, "west", rl.Vector2(pos2.x, pos2.y)))
 
-            if key_north in level.keys():
-                north = level[key_north]
-                if "south" in north.directions:
-                    north.directions.remove("south")
+    if key_north in level.keys():
+        north = level[key_north][0]
+        if "south" in north.directions:
+            north.directions.remove("south")
 
-            if key_west in level.keys():
-                west = level[key_west]
-                if "east" in west.directions:
-                    west.directions.remove("east")
+    if key_west in level.keys():
+        west = level[key_west][0]
+        if "east" in west.directions:
+            west.directions.remove("east")
 
     layout = get_layout(u.str_v2(door), tile_size, "plains", "house")
 
     building =  Tile (
         rotation = 0,
-        name = f"{name}_{building_num}",
+        name = "house",
         directions = [],
     )
 
@@ -131,24 +120,22 @@ def create_level(tile_size: int, map_size: int) -> tuple[rl.Vector2, dict, dict,
     building_tiles = []
     end = (map_size * tile_size) - tile_size
     end_pos = rl.Vector2(end, end)
-
-    biome = "plains"
     for y in range(map_size):
         for x in range(map_size):
             pos = rl.Vector2(x * tile_size, y * tile_size)
             key = u.v2_str(rl.Vector2(pos.x, pos.y))
 
             if x < 5 and y == 0:
-                monsters[key] = u.create_entity("weak_grass_tuft")
+                monsters[key] = u.create_entity("grass_tuft_weak")
+
+            level[key] = [create_tile(rl.Vector2(pos.x, pos.y), "grass_tile", tile_size, rl.Vector2(0, 0), rl.Vector2(end_pos.x, end_pos.x), level, building_tiles)]
 
             if y == 2 and x == 2:
-                building, tiles, door = create_building(rl.Vector2(pos.x, pos.y), tile_size, biome, level)
+                building, tiles, door = create_building(rl.Vector2(pos.x, pos.y), tile_size, level)
                 building_tiles.extend(tiles)
-                level[key] = building
+                level[key].append(building)
                 doors.update(door)
 
-            if not key in building_tiles:
-                level[key] = create_tile(rl.Vector2(pos.x, pos.y), "grass", tile_size, rl.Vector2(0, 0), rl.Vector2(end_pos.x, end_pos.x), level, building_tiles)
 
 
 

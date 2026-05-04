@@ -10,10 +10,12 @@ grass tuft king drops is grass roots
 
 def create_monster(monster: Template) -> dict:
     monsters = {}
-    levels = ["weak_", "", "strong_"]
+    levels = ["_weak", "", "_strong"]
+    names = ["Weak ", "", "Strong "]
     for i in range(len(levels)):
-        key = f"{levels[i]}{monster.name}"
-        new_name = key.replace("_", " ").title()
+        key = f"{monster.name}{levels[i]}"
+        name = f"{names[i]}{monster.name}"
+        new_name = name.replace("_", " ").title()
         j = i
         drops = {}
         while j > -1:
@@ -71,6 +73,7 @@ def level_zero() -> dict:
         descriptions = [
             "A few blades of grass that have teamed up. It looks as if it's attacking you, but it doesn't seem to be doing any damage.",
             "Many blades of grass have formed a \"mighty\" colony. They give you paper cuts, which will be very irritating for many days.",
+            "Dozens of colonies have come together under the rule of their glorious and beautiful leader, Dandelion."
         ],
         desc_index = [0, 1, 1],
         health = grass_stat_one,
@@ -90,47 +93,9 @@ def level_zero() -> dict:
 
     return monsters
 
-def level_one() -> dict:
-    minotaur_template = Template(
-        name = "minotaur",
-        descriptions = ["A monster that has good smell"],
-        desc_index = [0],
-        health = [5, 5, 5],
-        defense = [0, 0, 0],
-        strength = [5, 5, 5],
-        attack_speed = [1, 1, 1],
-        speed = [1, 1, 1],
-        all_stats = {"strength": 1},
-        stats_key = ["strength"],
-        all_drops = {"minotaur_horn": 1},
-        drops_key = ["minotaur_horn"],
-        locations = ["maze"],
-    )
-
-    gargoyle_template = Template(
-        name = "gargoyle",
-        descriptions = ["A stone monster"],
-        desc_index = [0],
-        health = [10, 10, 10],
-        defense = [0, 0, 0],
-        strength = [2, 2, 2],
-        attack_speed = [2, 2, 2],
-        speed = [1, 1, 1],
-        all_stats = {"attack_speed": 1},
-        stats_key = ["attack_speed"],
-        all_drops = {"living_stone": 1},
-        drops_key = ["living_stone"],
-        locations = ["maze"],
-    )
-
-    monsters = {}
-    monsters.update(create_monster(minotaur_template))
-    monsters.update(create_monster(gargoyle_template))
 
 
-    return monsters
 
 
 monster_data = {}
 monster_data.update(level_zero())
-monster_data.update(level_one())

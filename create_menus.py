@@ -9,10 +9,10 @@ scale = 2
 
 
 def create_main_menu() -> tuple[tuple[rl.Vector2, str], list[Button]]:
-    title_width = 64
-    title_pos = rl.Vector2(u.x_center_screen(title_width), rl.get_screen_height()//2)
+    title_width = 61 * 10
+    title_height = 27 * 10
+    title_pos = rl.Vector2(title_width//6, rl.get_screen_height()//2 - title_height)
     title_type = "title"
-    title_height = 32
 
     title_margin = 20
     button_margin = 10
@@ -38,9 +38,12 @@ def create_main_menu() -> tuple[tuple[rl.Vector2, str], list[Button]]:
         on_click = lambda: "load",
     )
 
+    width = 64 * scale
 
-    new.pos = rl.Vector2(u.x_center_screen(new.width), title_pos.y + title_height + title_margin)
-    load.pos = rl.Vector2(u.x_center_screen(load.width), new.pos.y + new.height + button_margin)
+    center = title_width//2 + title_pos.x
+    pos = center - width//2
+    new.pos = rl.Vector2(pos, title_pos.y + title_height + title_margin)
+    load.pos = rl.Vector2(pos, new.pos.y + new.height + button_margin)
     buttons = [new, load]
 
 
@@ -48,7 +51,9 @@ def create_main_menu() -> tuple[tuple[rl.Vector2, str], list[Button]]:
     return title, buttons
 
 def draw_main_menu(textures, title: tuple[rl.Vector2, str], buttons: list[Button]):
-    rl.draw_texture_ex(textures[title[1]], title[0], 0, 1, rl.WHITE)
+
+    rl.draw_texture_ex(textures["title_screen"], (0,0), 0, 10, rl.WHITE)
+    rl.draw_texture_ex(textures[title[1]], title[0], 0, 10, rl.WHITE)
 
     for button in buttons:
         rl.draw_texture_ex(textures[button.type], button.pos, 0, button.scale, rl.WHITE)
@@ -78,10 +83,13 @@ def create_load_menu() -> list:
 
     return buttons
 
-def draw_load_menu(textures, buttons: list):
-     for button in buttons:
+
+
+def draw_load_menu(textures, buttons: list, font):
+    for button in buttons:
          rl.draw_texture_ex(textures[button.type], button.pos, 0, button.scale, rl.WHITE)
-         rl.draw_text(button.text, int(button.text_pos.x), int(button.text_pos.y), 9 * scale, rl.BLACK)
+         rl.draw_text_ex(font, button.text, (button.text_pos.x, button.text_pos.y), 32, 1, rl.BLACK)
+
 
 
 def create_new_menu() -> Button:
@@ -104,9 +112,9 @@ def create_new_menu() -> Button:
 
     return button
 
-def draw_new_menu(textures, button: Button):
+def draw_new_menu(font: rl.Font, textures, button: Button):
     rl.draw_texture_ex(textures[button.type], button.pos, 0, button.scale, rl.WHITE)
-    rl.draw_text(button.text, int(button.text_pos.x), int(button.text_pos.y), 9 * scale, rl.BLACK)
+    rl.draw_text_ex(font, button.text, (button.text_pos.x, button.text_pos.y), 32, 1, rl.BLACK)
 
 
 def create_pause_menu() -> list[Button]:
@@ -118,7 +126,7 @@ def create_pause_menu() -> list[Button]:
         width = width,
         height = height,
         scale = scale,
-        text = "Resume",
+        text = "resume",
         text_pos = rl.Vector2(pos.x + (10 * scale), pos.y + (5 * scale)),
         type = "blank_button",
         on_click = lambda: "",
@@ -130,7 +138,7 @@ def create_pause_menu() -> list[Button]:
         width = width,
         height = height,
         scale = scale,
-        text = "Main Menu",
+        text = "main menu",
         text_pos = rl.Vector2(pos.x + (10 * scale), pos.y + (5 * scale)),
         type = "blank_button",
         on_click=lambda: "main",

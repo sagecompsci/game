@@ -3,6 +3,14 @@ Bracelet = namedtuple("Bracelet", ["name", "description", "type", "effects", "re
 
 item_type = "bracelets"
 bracelet_data = {
+    "grass_cuff": Bracelet (
+        name = "Grass Cuff",
+        description = "A simple cuff made from woven grass. It's very itchy.",
+        type = item_type,
+        effects = {"health": 2},
+        requirements = {},
+        locations = ["crafting"]
+    ),
     "simple_bracelet": Bracelet(
         name = "Simple Bracelet",
         description = "It's not very pretty",

@@ -1,14 +1,24 @@
 def nothing(): pass
 
 """
+ - create monster killing quest
+ - craft cooked drumstick
+ - more ui info
+
+                                 
 to-do
+    - figure out location and uses
+    - redo creating monsters
+    - figure out actual stats and drops
     - create npcs
     - create quests
     - generate village
     - create shops
     - create simple version of journal
-    - key items tab
-    - symbols for tabs instead of words
+    - change data and inventory 
+        - combine armor, bracelets, necklaces, rings into one named tuple
+        - create accessories inventory
+
     
     - wake up by a silver tree.
     - after you get certain number of tiles away you come across an injured centaur
@@ -22,12 +32,26 @@ to-do
     - if you don't accept the first quest everyone dies
     - if you don't accept the second quest some die
 
+- wake up in a bed in the village
+- leave the room/house to find someone
+
+    - you were found passed out in the field? what happened?
+    - I don't remember anything
+    - maybe if you make it to the bottom you can wish for your memories back
+- kill weeds in an abandoned house. Give food to take. There is one regular weed
+    - in return i'll show you how to craft simple items
 
 general 
     - floors are in upside pyramid, floors get smaller as you go down
-    - the tower is the world tree, the levels are the branches that get bigger as you go up
+    - the tower is the world tree, the levels are the roots that get bigger as you go up
     - eventually there is extra content, another pyramid that are the roots
         - can be accessed when you choose wish from tree
+    - there is a flower on every level. These flowers were stolen from the tree a long time ago and must be returned to
+        get your wish. There is a location on each level where the flower should be returned to.
+            - complete quest to get flower
+            - kill monster that stole it
+            - solve a puzzle dungeon
+            - it's just lost somewhere completely random
 
 monsters
     - monsters respawn in the morning?? or at night or something
@@ -35,7 +59,8 @@ monsters
     - monster   drop 1 and 2
     - strong monster   drop 1, 2, and three
     - monster king     special drop
-    - king drop can be crafted into rings that repel or attract that kind of monster
+        - monster king is only summoned after a certain number of that monster is killed
+        - king drop can be crafted into rings that repel or attract that kind of monster
     
     - monster following behavior
         - monsters should follow behind other monsters if chasing player. 
@@ -68,7 +93,7 @@ fighting
 
 inventory 
     - large inventory. gets bigger somehow
-    - each spot can hold 999, weapons and armor maybe limited number of slots
+    - each spot can hold 999, weapons and armor maybe limited number of slots 9?
     - infinite amount of gold
     - equips
         - each slot can only have one
@@ -80,28 +105,9 @@ inventory
         - in the description area both items will be shown, stacked on top of each other
         - button to stop comparing
 
-    on the left side is equips and player
-    in the middle is the inventory
-    on top are the tabs for different sections
-    on the right is the description of the item you are hovering over
-
-    - inventory item
-        - image
-        - count
-
-    - description
-        - image
-        - name
-        - description
-        - stats
-        - location
-        - uses
-
-    inventory["Item Name"] = [image, count]
-    if hovering then description_item = key
-        get json object(key)
 
 map
+
     - starter map only shows very zoomed out and only shows landmarks
     - can buy maps of more detail in villages.
     - each map is on a new page of the journal. maps sometimes take up both sides of the journal. can't zoom in, have to
@@ -119,16 +125,20 @@ hammer
 
 journal
     - stores information about items and monsters that you have seen
-    - if you see a monster, then the picture and name is added to the journal along with location of sighting
-    - if you kill a monster, the description, stats, and drops will be added to the journal
+    - if you see a creature, then the picture and name is added to the journal along with location of sighting
+    - if you kill a creature, the description, stats, and drops will be added to the journal
     - counts number of kills
-    - peaceful creatures are same as monsters
-    - if you see a weapon in a shop or put a weapon in your inventory, weapon description, pciture, name, stats are added
+    - types of creatures
+        - aggressive | will attack on sight
+        - passive | will only attack if attacked first
+        - peaceful | will not attack
+    - if you see a weapon in a shop or put a weapon in your inventory, weapon description, picture, name, stats are added
     - items are same as weapons, also have location info
 
     - has list of all current quests, all dialog lines for that quest, location of quest given
     - has all npcs that you have talked to. lists name, location, profession, and short description of them (maybe logs all conversation)
     - has alchemy recipes
+    
 
 alchemy
     - npc somewhere that says he is going to the city to learn alchemy, if you do quest he gives you book of recipes
@@ -141,8 +151,7 @@ maybe cooking?
     - must create a campfire with sticks and flint, flint is a key item that you get from centaurs
 
 crafting
-    - crafting tab
-    - only shows recipes that can be crafted without special equipment
+    - crafting tab accesses by hammer special item
  
 random
     - karma is accumulated by quests and doing good things, bad things give negative karma
@@ -197,6 +206,9 @@ levels
             wings they have to use bridges to get to some islands or pay npc to carry them back to maze
         - bottom of the floor is filled with black smoke. It slowly damages you if you touch it. after certain amount of
             time it makes wings stop working
+        - charon will ferry you to the bottom
+    
+    3. Volcano?
 
     forest floor (roots of the world tree)
 
@@ -231,8 +243,6 @@ npcs
     any
         - mermaid
         - satyrs
-        - charon is an npc on one of the levels
-            - maybe in the floating islands he ferries you down to the next level
     0. Villages
         - centaurs wandering merchants
 
@@ -270,21 +280,30 @@ monsters
         - ladon (serpent guarding golden apple)
 
 
-    0. Villages
-        - werewolves
-
-        - will o the wisp
-            - swamp area
-            - king drop: wisp
+    0. The Open Sky
+        Beginner
+            - grass/weed
+            - stumpling
+            - rat
+            - blue birds
+            - porcupine
+                - spine sword
             
-        - stumpling
-            - resents humans for cutting them down
+        Intermediate
+            - werewolves
+            - scare crow
+            - rock
+                - cannot be damaged by cutting
+            
+        Difficult
+            - frog ground trap
+            - 
         
-        - squirrels have spines
-            -drops: hide, bones, claws, spines
-        - blue birds
-            - drop blue feathers
-        - porcupine
+        
+            - will o the wisp
+                - king drop: wisp or "will" which allows you to create golems or something
+            
+        
     1. Maze
         - minotaur
             - mountain goats
@@ -317,4 +336,9 @@ monsters
 
         - harpies
             - drops: corrupted wings, talons, teeth
+            
+            
+            
+            
 """
+

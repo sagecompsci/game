@@ -7,33 +7,33 @@ chest = "armor chest"
 legs = "armor legs"
 feet = "armor feet"
 armor_data = {
-    "grass_hat": Armor(
-        name = "Grass Hat",
-        description = "A hat that keeps the sun out of your eyes.",
+    "grass_headband": Armor(
+        name = "Grass Headband",
+        description = "A simple headband made from woven grass, adorned with a dandelion",
         type = head,
         effects = {"defense": 1},
         requirements = {},
         locations = ["craft"],
     ),
-    "grass_shirt": Armor(
-        name = "Grass Shirt",
-        description = "A simple shirt made from grass. It's very itchy.",
+    "grass_sash": Armor(
+        name = "Grass Sash",
+        description = "A simple sash made from woven grass.",
         type = chest,
         effects = {"defense": 1},
         requirements = {},
         locations = ["craft"],
     ),
-    "grass_pants": Armor(
-        name = "Grass Pants",
-        description = "Simple pants made from grass. The bottoms are very frayed.",
+    "grass_skirt": Armor(
+        name = "Grass Skirt",
+        description = "A simple skirt made from woven grass.",
         type = legs,
         effects = {"defense": 1},
         requirements = {},
         locations = ["craft"],
     ),
-    "grass_shoes": Armor(
-        name = "Grass Shoes",
-        description = "They aren't very comfortable, but they're better than nothing.",
+    "grass_sandals": Armor(
+        name = "Grass Sandals",
+        description = "Simple sandals made from woven grass. They aren't very comfortable, but it's better than nothing.",
         type = feet,
         effects = {"defense": 1},
         requirements = {},

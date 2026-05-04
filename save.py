@@ -12,6 +12,10 @@ def save(state: GameState):
             "player": player,
             "inventory": state.inventory,
             "gold": state.gold,
+            "available_quests": state.available_quests,
+            "active_quests": state.active_quests,
+            "completed_quests": state.completed_quests,
+            "kills": state.kills,
             "level": state.level,
             "view": state.view,
             "levels": state.levels,
@@ -34,6 +38,10 @@ def load(name: str, state: GameState):
 
     state.inventory = data["inventory"]
     state.gold = data["gold"]
+    state.available_quests = data["available_quests"]
+    state.active_quests = data["active_quests"]
+    state.completed_quests = data["completed_quests"]
+    state.kills = data["kills"]
 
     state.level = data["level"]
     state.view = data["view"]

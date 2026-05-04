@@ -9,6 +9,8 @@ import create_menus
 import utilities as u
 import menu
 import inventory
+import journal
+from quests import quests
 
 def init():
     rl.init_window(1800, 900, "Maze")
@@ -19,7 +21,7 @@ def init():
         player = Player(
             pos = rl.Vector2(0, 0),
             image = "player",
-            health = 100,
+            health = 50,
             max_health = 100,
             defense = 0,
             strength = 1,
@@ -39,9 +41,15 @@ def init():
             "necklaces": {},
             "bracelets": {},
             "rings": {},
-            "items": {}
+            "items": {},
+            "consumables": {},
+            "special": {},
         },
         gold = 0,
+        available_quests = {},
+        active_quests = quests,
+        completed_quests = {},
+        kills = {},
         level = "one",
         location = "levels",
         view = {},
@@ -64,7 +72,7 @@ def init():
             "one": {},
             "two": {},
         },
-        tile_size = 16,
+        tile_size = 8,
         scale = 3,
         map_size= 20,
         textures = {},
@@ -72,7 +80,10 @@ def init():
         time = 0,
         last_movement = 0,
         menu = "main",
-        inv_view = "weapons"
+        inv_view = "weapons",
+        journal_tab_view = "creatures",
+        font = rl.get_font_default() ,
+        font_size = 25,
     )
 
     state.tile_size *= state.scale
@@ -86,7 +97,10 @@ def init():
     state.camera.rotation = 0
     state.camera.zoom = 1
 
+    state.font = rl.load_font_ex("font.ttf", 50, None, 0)
+
     reload(inventory)
+    reload(journal)
 
     return state
 
@@ -103,7 +117,7 @@ def main():
         if rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
             pass
 
-        if state.menu == "" or state.menu == "inventory":
+        if state.menu in ("", "inventory", "journal"):
             gameplay.game_loop(state)
         else:
             menu.menu(state, main_title, main_buttons, load_buttons, new_button, pause_buttons)
@@ -111,21 +125,25 @@ def main():
         save(state)
 
 def inv_test(state):
-    u.add_to_inventory(state.inventory["weapons"], "sword",  "weapons", 10)
-    u.add_to_inventory(state.inventory["weapons"], "dagger",  "weapons", 10)
+    u.add_to_inventory(state.inventory["weapons"], "wood_sword",  "weapons", 10)
 
-    u.add_to_inventory(state.inventory["armor"], "grass_hat",  "armor head", 10)
-    u.add_to_inventory(state.inventory["armor"], "grass_shirt",  "armor chest", 10)
-    u.add_to_inventory(state.inventory["armor"], "grass_pants",  "armor legs", 10)
-    u.add_to_inventory(state.inventory["armor"], "grass_shoes",  "armor feet", 10)
+    u.add_to_inventory(state.inventory["armor"], "grass_headband",  "armor head", 10)
+    u.add_to_inventory(state.inventory["armor"], "grass_sash",  "armor chest", 10)
+    u.add_to_inventory(state.inventory["armor"], "grass_skirt",  "armor legs", 10)
+    u.add_to_inventory(state.inventory["armor"], "grass_sandals",  "armor feet", 10)
 
-    u.add_to_inventory(state.inventory["bracelets"], "simple_bracelet",  "bracelets", 10)
-    u.add_to_inventory(state.inventory["bracelets"], "sturdy_bracelet",  "bracelets", 10)
+    u.add_to_inventory(state.inventory["bracelets"], "grass_cuff",  "bracelets", 10)
+    u.add_to_inventory(state.inventory["rings"], "dandelion_ring",  "rings",10)
 
-    u.add_to_inventory(state.inventory["necklaces"], "simple_necklace",  "necklaces", 10)
+    u.add_to_inventory(state.inventory["items"], "dandelion", "items", 10)
+    u.add_to_inventory(state.inventory["items"], "grass", "items", 10)
+    u.add_to_inventory(state.inventory["items"], "leaf", "items", 10)
+    u.add_to_inventory(state.inventory["items"], "mushroom", "items", 10)
+    u.add_to_inventory(state.inventory["items"], "wood", "items", 10)
 
-    u.add_to_inventory(state.inventory["rings"], "ring_one",  "rings",10)
-    u.add_to_inventory(state.inventory["rings"], "ring_two",  "rings",10)
-    u.add_to_inventory(state.inventory["rings"], "ring_three",  "rings",10)
+    u.add_to_inventory(state.inventory["consumables"], "apple", "consumables", 10)
+    u.add_to_inventory(state.inventory["special"], "map", "special", 10)
+    u.add_to_inventory(state.inventory["special"], "journal", "special", 10)
+
 
 main()

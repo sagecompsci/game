@@ -74,9 +74,9 @@ def menu(state: GameState, main_title, main_buttons, load_buttons, new_input, pa
         if state.menu == "main":
             create_menus.draw_main_menu(state.textures, main_title, main_buttons)
         elif state.menu == "load":
-            create_menus.draw_load_menu(state.textures, load_buttons)
+            create_menus.draw_load_menu(state.textures, load_buttons, state.font)
         elif state.menu == "new":
-            create_menus.draw_new_menu(state.textures, new_input)
+            create_menus.draw_new_menu(state.font, state.textures, new_input)
         elif state.menu == "pause":
             create_menus.draw_pause_menu(state.textures, pause_buttons)
 

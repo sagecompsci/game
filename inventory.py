@@ -1,4 +1,6 @@
 import pyray as rl
+from typing_extensions import NamedTuple
+
 from my_dataclasses import Player
 from data.items import item_data
 from data.weapons import weapon_data
@@ -7,103 +9,103 @@ from data.bracelets import bracelet_data
 from data.necklaces import necklace_data
 from data.rings import ring_data
 import utilities as u
-import math
 
-scale = rl.get_screen_width()//140
+from ui_info import scale
+
 img_size = 8 * scale
-height = 48 * scale
-item_margin = 1 * scale
-inventory_margin = 1 * scale
 
-equips_width = 48 * scale
-items_width = 48 * scale
-description_width = 21 * scale
+three = 3 * scale
+five = 5 * scale
+six = 6 * scale
+spacing = 1
+spacing_height = spacing * 4
 
-button_scale = scale//6
-button_size = rl.Vector2(64 * button_scale, 16 * button_scale)
-button_margin = 1 * scale
+stats_size = rl.Vector2(64 * scale, 19 * scale)
+equips_size = rl.Vector2(64 * scale, 42 * scale)
+inventory_size = rl.Vector2(64 * scale, 64 * scale)
+description_size = rl.Vector2(36 * scale, 64 * scale)
 
-font = rl.get_font_default()
-spacing = .5 * scale
-font_size = 2 * scale
+total_size = rl.Vector2(stats_size.x + three + inventory_size.x + three + description_size.x, inventory_size.y)
+center = rl.Vector2(rl.get_screen_width()//2, rl.get_screen_height()//2)
+width = rl.get_screen_width()
+rl.get_screen_height()
 
-name_size = 4 * scale
-count_margin = 1 * scale
-text_margin = 1 * scale
-border = 2 * scale
+stats_pos = rl.Vector2(center.x - total_size.x//2, center.y - total_size.y//2)
+stats_start = rl.Vector2(stats_pos.x + five, stats_pos.y + five)
+stats_end = rl.Vector2(stats_pos.x + stats_size.x - five, stats_pos.y + stats_size.y - five)
 
-total_width = equips_width + items_width + description_width + (inventory_margin * 3)
-start_x = (rl.get_screen_width()//2) - (total_width//2)
-start_y = rl.get_screen_height()//2 - height//2
-equips_pos = rl.Vector2(start_x, start_y )
-items_pos = rl.Vector2(equips_pos.x + equips_width + inventory_margin, start_y)
-description_pos = rl.Vector2(items_pos.x + items_width + inventory_margin, start_y)
+equips_pos = rl.Vector2(stats_pos.x, stats_pos.y + stats_size.y + three)
+equip_margin = 11 * scale
 
-button_pos = rl.Vector2(items_pos.x, items_pos.y - button_size.y - button_margin)
+weapon_pos = rl.Vector2(equips_pos.x + six, equips_pos.y + six)
+head_pos = rl.Vector2(weapon_pos.x + equip_margin, weapon_pos.y)
+chest_pos = rl.Vector2(head_pos.x + equip_margin, weapon_pos.y)
+legs_pos = rl.Vector2(chest_pos.x + equip_margin, weapon_pos.y)
+feet_pos = rl.Vector2(legs_pos.x + equip_margin, weapon_pos.y)
+equips_end = feet_pos.x + equip_margin
 
-stat_pos = rl.Vector2(
-    border + equips_pos.x,
-    border + equips_pos.y)
-stat_pos_end = rl.Vector2(
-    equips_pos.x + equips_width - border,
-    18 * scale + equips_pos.y
-)
+necklace_pos = rl.Vector2(weapon_pos.x, weapon_pos.y + equip_margin)
+bracelet_pos = rl.Vector2(necklace_pos.x + equip_margin, necklace_pos.y)
+ring_pos = rl.Vector2(bracelet_pos.x + equip_margin * 2, necklace_pos.y)
 
-weapon_pos = rl.Vector2(
-    border + equips_pos.x,
-    20 * scale + equips_pos.y)
-head_pos = rl.Vector2(weapon_pos.x + img_size + item_margin, weapon_pos.y)
-chest_pos = rl.Vector2(head_pos.x + img_size + item_margin, weapon_pos.y)
-leg_pos = rl.Vector2(chest_pos.x + img_size + item_margin, weapon_pos.y)
-feet_pos = rl.Vector2(leg_pos.x + img_size + item_margin, weapon_pos.y)
+inventory_pos = rl.Vector2(stats_pos.x + stats_size.x + three, stats_pos.y)
+item_pos = rl.Vector2(inventory_pos.x + six, inventory_pos.y + six)
+item_height = 9
+item_margin = 11 * scale
+tab_size = rl.Vector2(8 * scale, 8 * scale)
+tab_pos = rl.Vector2(inventory_pos.x, inventory_pos.y - 11 * scale)
+tab_margin = 9 * scale
 
-necklace_pos = rl.Vector2(weapon_pos.x, weapon_pos.y + img_size + item_margin)
-bracelet_pos = rl.Vector2(necklace_pos.x + img_size + item_margin, necklace_pos.y)
-ring_pos = rl.Vector2(bracelet_pos.x + (img_size + item_margin) * 2, necklace_pos.y)
-equip_end = equips_pos.x + border + (img_size + item_margin) * 5
+description_pos = rl.Vector2(inventory_pos.x + inventory_size.x + three, inventory_pos.y)
+text_margin = six
+text_start = rl.Vector2(description_pos.x + text_margin, description_pos.y + text_margin)
+text_end = rl.Vector2(description_pos.x + description_size.x - text_margin, description_pos.y + description_size.y - text_margin)
+text_area = rl.Vector2(text_end.x - text_start.x, text_end.y - text_start.y)
 
-item_pos_start = rl.Vector2(
-    border + items_pos.x,
-    border + items_pos.y)
 
-description_text_start = rl.Vector2(
-    border + description_pos.x,
-    22 * scale + description_pos.y)
+def draw_text(font: rl.Font, text: str, font_size: float, pos: rl.Vector2):
+    centered = u.center_text(font, text, font_size, spacing, rl.Vector2(pos.x, pos.y), description_size.x, 0)
+    rl.draw_text_ex(font, text.upper(), centered, font_size, spacing, rl.BLACK)
 
-description_image_start = rl.Vector2(
-    3 * scale + description_pos.x,
-    3 * scale + description_pos.y)
-
-def draw_text(text: str, font_size: float, pos: rl.Vector2):
-    centered = u.center_text(font, text, font_size, spacing, rl.Vector2(pos.x, pos.y), description_width, 0)
-    rl.draw_text_ex(font, text, centered, font_size, spacing, rl.BLACK)
-
-def draw_stats(player: Player, gold: int):
+def draw_stats(font: rl.Font, font_size: int, player: Player, gold_count: int, textures: dict):
+    rl.draw_texture_ex(textures["stats"], (stats_pos.x, stats_pos.y), 0, scale, rl.WHITE)
     size = rl.measure_text_ex(font, "Test", font_size, spacing)
     font_height = size.y
 
     p = player
-    health = f"Health: {math.trunc(p.health)} / {math.trunc(p.max_health)} (+{math.trunc(p.bonus_health)})"
-    defense = f"Defense: {math.trunc(p.defense)} (+{math.trunc(p.bonus_defense)})"
-    strength = f"Strength: {math.trunc(p.strength)} (+{math.trunc(p.bonus_strength)})"
-    attack_speed = f"Attack Speed: {math.trunc(p.attack_speed)} (+{math.trunc(p.bonus_attack_speed)})"
-    speed = f"Speed: {math.trunc(p.speed)} (+{math.trunc(p.bonus_speed)})"
-    gold = f"{gold} Gold"
+    health = f"Health: {p.health + p.bonus_health} / {p.max_health + p.bonus_health} (+ {p.bonus_health})"
+    defense = f"Defense: {p.defense + p.bonus_defense} (+ {p.bonus_defense})"
+    strength = f"Strength: {p.strength + p.bonus_strength} (+ {p.bonus_strength})"
+    attack_speed = f"Attack Speed: {p.attack_speed + p.bonus_attack_speed} (+ {p.bonus_attack_speed})"
+    speed = f"Speed: {p.speed + p.bonus_speed} (+ {p.bonus_speed})"
+    gold = f"{gold_count} Gold"
 
-    stats = [health, defense, strength, attack_speed, speed, gold]
-    pos = rl.Vector2(stat_pos.x, stat_pos.y)
+    pos = rl.Vector2(stats_start.x, stats_start.y)
+
+    # Draw Health
+    rl.draw_text_ex(font, health, rl.Vector2(pos.x, pos.y), font_size, spacing, rl.BLACK)
+    pos.y += font_height + spacing_height
+
+    # Draw stats
+    stats = [defense, strength, gold, attack_speed, speed]
     for i in range(len(stats)):
-        x = pos.x
-        rl.draw_text_ex(font, stats[i], rl.Vector2(x, pos.y), font_size, spacing, rl.BLACK)
-        pos.y += font_height + border//2
+        if i == 3:
+            pos.x = stats_start.x + (stats_end.x - stats_start.x)//2
+            pos.y = stats_start.y + font_height + spacing_height
+
+        rl.draw_text_ex(font, stats[i], rl.Vector2(pos.x, pos.y), font_size, spacing, rl.BLACK)
+        pos.y += font_height + spacing_height
+
+    # Draw Gold
 
 
-def draw_equips(player: Player, gold: int, inventory: dict, desc_item: str, mouse: rl.Vector2, textures: dict, equips: dict) -> str:
+
+
+def draw_equips(inventory: dict, desc_item: str, mouse: rl.Vector2, textures: dict, equips: dict) -> str:
     remove_name = ""
     rl.draw_texture_ex(textures["equips"], equips_pos, 0, scale, rl.WHITE)
-    draw_stats(player, gold)
 
-    types = {"weapons": weapon_pos, "armor head": head_pos, "armor chest": chest_pos, "armor legs": leg_pos, "armor feet": feet_pos,
+    types = {"weapons": weapon_pos, "armor head": head_pos, "armor chest": chest_pos, "armor legs": legs_pos, "armor feet": feet_pos,
              "necklaces": necklace_pos, "bracelets": bracelet_pos, "rings": ring_pos}
     for key, value in types.items():
         items = [(item_name, item) for item_name, item in equips.items() if item.type == key]
@@ -113,16 +115,17 @@ def draw_equips(player: Player, gold: int, inventory: dict, desc_item: str, mous
             for i in range(item.count):
                 if pos.x <= mouse.x <= pos.x + img_size and pos.y <= mouse.y <= pos.y + img_size:
                     desc_item = f"{name}"
+                    rl.draw_texture_ex(textures["highlight"], rl.Vector2(pos.x - scale, pos.y - scale), 0, scale, rl.WHITE)
                     if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_RIGHT):
                         remove_name = name
 
-                rl.draw_texture_ex(textures["blank"], rl.Vector2(pos.x, pos.y), 0, scale, rl.WHITE)
+                rl.draw_texture_ex(textures["blank_equip"], rl.Vector2(pos.x, pos.y), 0, scale, rl.WHITE)
                 rl.draw_texture_ex(textures[name], rl.Vector2(pos.x, pos.y), 0, scale, rl.WHITE)
 
-                pos.x += img_size + item_margin
-                if pos.x == equip_end:
+                pos.x += item_margin
+                if pos.x == equips_end:
                     pos.x = weapon_pos.x
-                    pos.y += img_size + item_margin
+                    pos.y += item_margin
 
 
     if remove_name != "":
@@ -132,32 +135,34 @@ def draw_equips(player: Player, gold: int, inventory: dict, desc_item: str, mous
 
     return desc_item
 
-def draw_items(player: Player, inventory: dict, desc_item: str, mouse: rl.Vector2, textures: dict, items: dict) -> str:
+def draw_items(font: rl.Font, font_size: float, player: Player, inventory: dict, desc_item: str, mouse: rl.Vector2, textures: dict, items: dict) -> tuple[str, bool]:
+    journal = False
     remove_name = ""
-    rl.draw_texture_ex(textures["items"], items_pos, 0, scale, rl.WHITE)
+    rl.draw_texture_ex(textures["inventory"], inventory_pos, 0, scale, rl.WHITE)
 
-    pos = rl.Vector2(item_pos_start.x, item_pos_start.y)
+
+    pos = rl.Vector2(item_pos.x, item_pos.y)
     for key, value in items.items():
         if pos.x <= mouse.x <= pos.x + img_size and pos.y <= mouse.y <= pos.y + img_size:
             desc_item = f"{key}"
-            if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_RIGHT) and value.type != "items":
+            rl.draw_texture_ex(textures["highlight"], rl.Vector2(pos.x - scale, pos.y - scale), 0, scale, rl.WHITE)
+            if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_RIGHT) and not value.type in ("items", "consumables", "special"):
                 remove_name = key
+            if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_RIGHT) and key == "journal":
+                journal = True
+
 
 
         text = str(value.count)
         size = rl.measure_text_ex(font, text, font_size, spacing)
-        count_pos = rl.Vector2(
-            pos.x + img_size - size.x - count_margin,
-            pos.y + img_size - size.y - count_margin,
-        )
 
         rl.draw_texture_ex(textures[f"{key}"], rl.Vector2(pos.x, pos.y), 0, scale, rl.WHITE)
-        rl.draw_text_ex(font, text, rl.Vector2(count_pos.x, count_pos.y), font_size, spacing, rl.WHITE)
+        rl.draw_text_ex(font, text, rl.Vector2(pos.x, pos.y + img_size - size.y//2), font_size, spacing, rl.BLACK)
 
-        pos.x += img_size + item_margin
-        if pos.x > items_pos.x + items_width:
-            pos.x = item_pos_start.x
-            pos.y += img_size + item_margin
+        pos.x += item_margin
+        if pos.x > item_pos.x + inventory_size.x:
+            pos.x = item_pos.x
+            pos.y += item_margin
 
     if remove_name != "":
         add = True
@@ -185,9 +190,59 @@ def draw_items(player: Player, inventory: dict, desc_item: str, mouse: rl.Vector
             u.add_to_inventory(inventory["equips"], remove_name, value.type, 1)
             u.remove_from_inventory(inventory[value.type.split(" ")[0]], remove_name, 1)
 
-    return desc_item
+    return desc_item, journal
 
-def draw_description(textures: dict, item_name: str):
+def wrap_lines(font: rl.Font, text: str, font_size: float, text_width: int) -> list[str]:
+    lines_list = []
+    lines = []
+    text_size = rl.measure_text_ex(font, text, font_size, spacing)
+    if text_size.x > text_width:
+        words = text.split(" ")
+        line = []
+        while len(words) > 0:
+            if not line:
+                line.append(words[0])
+                words.pop(0)
+                while True:
+                    if len(words) <= 0:
+                        lines_list.append(line.copy())
+                        break
+
+                    line.append(words[0])
+                    if rl.measure_text_ex(font, " ".join(line), font_size, spacing).x > text_width:
+                        line.pop(-1)
+                        lines_list.append(line.copy())
+                        line = []
+                        break
+
+                    else:
+                        words.pop(0)
+
+    else:
+        lines = [text]
+
+    for line in lines_list:
+        lines.append(" ".join(line))
+
+    return lines
+
+def draw_wrapped_text(font: rl.Font, lines: list[str], pos: rl.Vector2, font_size, spacing, centered: bool = False):
+    line_size = rl.Vector2(0, 0)
+    x = 0
+    for line in lines:
+        line_size = rl.measure_text_ex(font, line, font_size, spacing)
+        x = 0
+        if centered:
+            x -= line_size.x//2
+
+        rl.draw_text_ex(font, line, rl.Vector2(pos.x + x, pos.y),font_size, spacing, rl.BLACK)
+        pos.y += line_size.y + line_size.y // 4
+
+    return rl.Vector2(line_size.x, line_size.y), rl.Vector2(pos.x + x, pos.y)
+
+
+def draw_description(font: rl.Font, font_size: float, text_font_size: float, textures: dict, item_name: str):
+    color = rl.BLACK
     rl.draw_texture_ex(textures["description"], description_pos, 0, scale, rl.WHITE)
 
     if item_name != "":
@@ -204,58 +259,85 @@ def draw_description(textures: dict, item_name: str):
         elif item_name in ring_data.keys():
             item = ring_data[item_name]
 
-        rl.draw_texture_ex(textures[item_name], description_image_start, 0, 2 * scale, rl.WHITE)
-        pos = rl.Vector2(description_text_start.x, description_text_start.y)
 
-        draw_text(item_name, name_size, pos)
+        # Draw Item Name
+        name_size = rl.measure_text_ex(font, item.name, font_size, spacing)
+        name_pos = rl.Vector2(text_start.x + text_area.x//2, text_start.y)
+        lines = wrap_lines(font, item.name, font_size, int(text_area.x))
+        draw_wrapped_text(font, lines, rl.Vector2(name_pos.x, name_pos.y), font_size, spacing, True)
 
-        name_height = rl.measure_text_ex(font, item_name, name_size, spacing)
-        pos.y += name_height.y + text_margin
+        # Draw Description
+        text_pos = rl.Vector2(text_start.x + text_area.x//2, name_pos.y + name_size.y + name_size.y//4)
+        lines = wrap_lines(font, item.description, text_font_size, int(text_area.x))
+        line_size, line_pos = draw_wrapped_text(font, lines, rl.Vector2(text_pos.x, text_pos.y), text_font_size, spacing, True)
+        y_margin = line_size.y + line_size.y // 4
+        pos = rl.Vector2(text_start.x, line_pos.y + y_margin * 1.5)
+
+        if not item.type in ("items", "special", "consumables"):
+            # Draw Requirements
+            for stat, num in item.requirements.items():
+                rl.draw_text_ex(font, f"Requires: {num} {stat}", rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
+                pos.y += y_margin
+            # Draw Stats
+            for stat, num in item.effects.items():
+                rl.draw_text_ex(font, f"{stat} + {num}", rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
+                pos.y += y_margin
+
+        elif item.type in ("items", "special", "consumables"):
+            # Draw Uses
+            for use in item.uses:
+                rl.draw_text_ex(font, f"Uses: {use}", rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
+                pos.y += y_margin
+
+        # Draw Locations
+        for location in item.locations:
+            rl.draw_text_ex(font, f"Locations: {location}", rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
+            pos.y += y_margin
 
 
-        content = [f"{item.description}"]
-        if item_name in item_data:
-            content.append(f"{item.uses}")
-        else:
-            content.extend([f"{item.effects}", f"{item.requirements}"])
-
-        content.append(f"{item.locations}")
-
-        text_size = rl.measure_text_ex(font, "Test", font_size, spacing)
-        for string in content:
-            draw_text(string, font_size, rl.Vector2(pos.x, pos.y))
-            pos.y += text_size.y + text_margin
-
-
-def draw_inv_buttons(mouse: rl.Vector2, textures: dict, types: list[str], inv_view: str) -> str:
+def draw_inv_tabs(mouse: rl.Vector2, textures: dict, types: list[str], inv_view: str) -> str:
     view = inv_view
-    pos = rl.Vector2(button_pos.x, button_pos.y)
+    pos = rl.Vector2(tab_pos.x, tab_pos.y)
     for item_type in types:
         if inv_view == item_type:
-            y = button_margin
+            y = - 2 * scale
         else:
             y = 0
-        rl.draw_texture_ex(textures["blank_button"], rl.Vector2(pos.x, pos.y + y), 0, button_scale, rl.WHITE)
-        text_pos = u.center_text(font, item_type, font_size, spacing, rl.Vector2(pos.x, pos.y + y), button_size.x, button_size.y)
-        rl.draw_text_ex(font, item_type, rl.Vector2(text_pos.x, text_pos.y), font_size, spacing, rl.WHITE)
+        rl.draw_texture_ex(textures[f"tab_{item_type}"], rl.Vector2(pos.x, pos.y + y), 0, scale, rl.WHITE)
 
         if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_LEFT):
-            if pos.x <= mouse.x <= pos.x + button_size.x and pos.y <= mouse.y <= pos.y + button_size.y:
+            if pos.x + scale <= mouse.x <= pos.x + scale + tab_size.x and pos.y + scale<= mouse.y <= pos.y + scale + tab_size.y:
                 view = item_type
 
-        pos.x += button_margin + button_size.x
+        pos.x += tab_margin
 
     return view
 
-def draw_inventory(player: Player, inventory:dict, gold: int, textures: dict, inv_view: str) -> str:
+def draw_inventory(font, font_size, player: Player, inventory:dict, gold: int, textures: dict, inv_view: str) -> tuple[str, bool]:
+    text_font_size = font_size * .75
+    tabs = {
+        "weapons": ["weapons"],
+        "armor": ["armor"],
+        "accessories": ["necklaces", "bracelets", "rings"],
+        "items": ["items"],
+        "consumables": ["consumables"],
+        "special": ["special"]
+    }
     desc_item = ""
     mouse = rl.get_mouse_position()
 
-    desc_item = draw_equips(player, gold, inventory, desc_item, mouse, textures, inventory["equips"])
-    desc_item = draw_items(player, inventory, desc_item, mouse, textures, inventory[inv_view])
+    draw_stats(font, text_font_size, player, gold, textures)
 
-    inv_view = draw_inv_buttons(mouse, textures, ["weapons", "armor", "necklaces", "bracelets", "rings", "items"], inv_view)
+    desc_item = draw_equips(inventory, desc_item, mouse, textures, inventory["equips"])
 
-    draw_description(textures, desc_item)
+    inventories = {}
+    for category in tabs[inv_view]:
+        inventories.update(inventory[category])
 
-    return inv_view
+    desc_item, journal = draw_items(font, font_size, player, inventory, desc_item, mouse, textures, inventories)
+
+    inv_view = draw_inv_tabs(mouse, textures, list(tabs.keys()), inv_view)
+
+    draw_description(font, font_size, text_font_size, textures, desc_item)
+
+    return inv_view, journal
