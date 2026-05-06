@@ -94,7 +94,7 @@ def create_building(pos: rl.Vector2, tile_size: int, level: dict) -> tuple[Tile,
         if "east" in west.directions:
             west.directions.remove("east")
 
-    layout = get_layout(u.str_v2(door), tile_size, "plains", "house")
+    layout = get_layout(u.str_v2(door), tile_size,)
 
     building =  Tile (
         rotation = 0,
@@ -125,7 +125,7 @@ def create_level(tile_size: int, map_size: int) -> tuple[rl.Vector2, dict, dict,
             pos = rl.Vector2(x * tile_size, y * tile_size)
             key = u.v2_str(rl.Vector2(pos.x, pos.y))
 
-            if x < 5 and y == 0:
+            if x < map_size and y == 0:
                 monsters[key] = u.create_entity("grass_tuft_weak")
 
             level[key] = [create_tile(rl.Vector2(pos.x, pos.y), "grass_tile", tile_size, rl.Vector2(0, 0), rl.Vector2(end_pos.x, end_pos.x), level, building_tiles)]

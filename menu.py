@@ -3,9 +3,7 @@ import pyray as rl
 from my_dataclasses import GameState
 import save
 import create_menus
-from generate_levels.generate_two import create_maze
 from generate_levels.generate_one import create_level as create_one
-from movement import get_adjacent_tiles
 
 def get_save_name(name: str):
     key = rl.get_char_pressed()

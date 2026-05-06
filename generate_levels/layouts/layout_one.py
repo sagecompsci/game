@@ -4,6 +4,7 @@ import random
 
 import utilities as u
 from my_dataclasses import Tile
+from npcs import Npc, npc
 
 def get_wall(tile_pos: rl.Vector2, x: int, y: int, size: int, tile_size: int, door_pos: rl.Vector2) -> dict:
     tiles = {}
@@ -72,15 +73,21 @@ def get_wall(tile_pos: rl.Vector2, x: int, y: int, size: int, tile_size: int, do
 
     return tiles
 
-def get_layout(door_pos: rl.Vector2, tile_size: int, biome: str, building_type: str) -> dict:
+def create_npc(tile_pos: str):
+    npc.pos = tile_pos
+    return npc
+
+def get_layout(door_pos: rl.Vector2, tile_size: int) -> dict:
     tiles = {}
     monsters = {}
     chests = {}
-    size = 9
+    npcs = {}
+    size = 3
     start_pos = rl.Vector2(door_pos.x - (size//2) * tile_size, door_pos.y - (size * tile_size))
     for y in range(size):
         for x in range(size):
             tile_pos = rl.Vector2(start_pos.x + (x * tile_size), start_pos.y + (y * tile_size))
+            tile_key = u.v2_str(tile_pos)
             tile_name = [tile.split(".")[0] for tile in os.listdir("images/tiles") if "stone_floor" in tile]
             name = random.choice(tile_name)
 
@@ -95,7 +102,7 @@ def get_layout(door_pos: rl.Vector2, tile_size: int, biome: str, building_type: 
                 directions.append("south")
 
 
-            tiles[u.v2_str(rl.Vector2(tile_pos.x, tile_pos.y))] = [Tile (
+            tiles[tile_key] = [Tile (
                 rotation = 0,
                 name = name,
                 directions = directions,
@@ -104,34 +111,11 @@ def get_layout(door_pos: rl.Vector2, tile_size: int, biome: str, building_type: 
 
             tiles.update(get_wall(rl.Vector2(tile_pos.x, tile_pos.y), x, y, size, tile_size, door_pos))
 
-    return {"tiles": tiles, "monsters": monsters, "chests": chests}
+            if y == 0 and x == 1:
+                npc = create_npc(tile_key)
+                npcs[tile_key] = npc
 
 
 
 
-layout_data = {
-    "plains_tent_1": {
-        "tiles": {
-            "144.0,144.0": Tile(
-                rotation = 0,
-                name = "two",
-                directions = ["north"],
-            ),
-            "144.0,96.0": Tile (
-                rotation = 180,
-                name = "two",
-                directions = ["south", "north"],
-            ),
-            "144.0,48.0": Tile(
-                rotation=180,
-                name="one",
-                directions=["south"],
-            ),
-        },
-        "chests": {},
-        "monsters": {
-            "144.0,48.0": u.create_entity("grass_tuft_weak")
-        }
-    },
-
-}
+    return {"tiles": tiles, "monsters": monsters, "chests": chests, "npcs": npcs}

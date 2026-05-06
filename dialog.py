@@ -1,123 +1,137 @@
 import pyray as rl
-from django.conf.locale.ar.formats import THOUSAND_SEPARATOR
+import utilities as u
+from npcs import Npc, Dialog
+import quests
+from quests import KillQuest
 
-from dataclasses import dataclass
+from ui_info import (scale, font_size, text_font_size, spacing, color,
+                      text_box_large_size, text_box_large_margin, text_box_small_size, text_box_small_margin,
+                     )
 
-@dataclass
-class NPC:
-    name: str # Korra npc name to display on quest and text box
-    image: str # npc file name of texture
-    pos: str # key of tile they are standing on
-    quest_code: int # key to the quest in dictionary and active quest list
-    rewarded: bool # if player have received quest reward
-    dialog: dict[int, tuple]
+center = rl.Vector2(rl.get_screen_width()//2, rl.get_screen_height()//2)
+text_box_pos = rl.Vector2(center.x - text_box_large_size.x//2, center.y - text_box_large_size.y//2)
+text_start = rl.Vector2(text_box_pos.x + text_box_large_margin.x, text_box_pos.y + text_box_large_margin.y)
+text_end = rl.Vector2(text_box_pos.x + text_box_large_size.x - text_box_large_margin.x, text_box_pos.y + text_box_large_size.y - text_box_large_margin.y)
 
+name_box_pos = rl.Vector2(text_box_pos.x, text_box_pos.y - scale - text_box_small_size.y)
+name_pos = rl.Vector2(name_box_pos.x + text_box_small_margin.x, name_box_pos.y + text_box_small_margin.y)
 
-npc = NPC (
-    name = "Korra",
-    image = "npc",
-    pos = "0.0,0.0",
-    quest_code = 1,
-    rewarded = False,
-    dialog = {
-        1: ("Can you help me kill some weeds?", ["Yes", "Maybe Later"], [2, 3]),
-        2: ("Do you have any questions?", ["Tell me about the town.", "No"], [4, 0], quest_code),
-        4: ("This is a small town. Something about the chief.", ["Where is the chief?", "Bye"], [5, 0]),
-        5: ("You should be able to find him in the south field. Anything else?", ["Tell me About the town.", "No"], [4, 0]),
-        3: ("Let me know if you change your mind.", ["Tell me about the town.", "Bye"], [4, 0])
-    }
-)
+options_pos = rl.Vector2(text_box_pos.x + text_box_large_size.x + 3 * scale, text_box_pos.y)
+# if hovering over text box it moves -2x and gets highlight around the edge
 
-display dialog:
-    text = dialog[key][0]
-    answers = dialog[key][1]
-    new_index = dialog[key][2]
-    if dialog[key][3]:
-        quest_index = dialog[key][3]
+def get_variables(text: str) -> list[str]:
+    indexes = []
+    for i in range(len(text)):
+        if text[i] in ("{", "}"):
+            indexes.append(i)
+        elif i == 0:
+            indexes.append(0)
+        elif i == len(text) - 1:
+            indexes.append(len(text))
 
-"""
-Can you help kill some weeds?
-    - Yes
-        Do you have any questions?
-            - Tell me about the town
-                Town description. Any other questions?
-                    - Where is the cheif?
-                        He's usually in location at this time of day. Anything else?
-                            - Tell me about the town
-                            - No ## 
-                    - No ## 
-            - No  ## something that marks that this ends the conversation
-        
-    - Maybe Later
-        Let me know if you ever change your mind.
-            - Tell me about the town
-            - bye ## 
+    words = []
+    for i in range(len(indexes)):
+        if i != len(indexes) - 1:
+            end = indexes[i + 1]
+            start = indexes[i]
+            if text[indexes[i]] == "}":
+                start += 1
 
+            words.append(text[start:end])
 
-"""
+    return words
+
+def get_new_text(text: str, quest: KillQuest) -> str:
+    words = get_variables(text)
+    new_text = ""
+    for word in words:
+        if word[0] == "{":
+            variable = word[1: len(word)]
+            word = quest.__getattribute__(variable)
+        new_text += str(word)
+
+    return new_text
 
 
+def draw_text_box(textures, font: rl.Font, name: str, dialog: str):
+    # Draw text box and dialog
+    rl.draw_texture_ex(textures["text_box_large"], text_box_pos, 0, scale, rl.WHITE)
+    lines = u.wrap_lines(font, dialog, font_size, spacing, int(text_end.x - text_start.x))
+    u.draw_wrapped_text(font, lines, text_start, font_size, spacing, color)
 
-["I have a quest. Do you want it?"]
+    # Draw name box and name
+    rl.draw_texture_ex(textures["text_box_small"], name_box_pos, 0, scale, rl.WHITE)
+    rl.draw_text_ex(font, name, name_pos, font_size, spacing, color)
 
-answer = ["yes", "maybe later"]
+def draw_options(menu: str, textures, font: rl.Font, quest_status, quest_code: int, dialog: Dialog,
+                 dialog_code: int, options: list[str], codes: list[int], quest_dialog: int, quest_option: int = None)\
+                 -> tuple[int, str, str]:
+    pos = rl.Vector2(options_pos.x, options_pos.y)
+    mouse = rl.get_mouse_position()
 
-if answer == 1:
-    create quest
-    ["response dialog 1"]
+    for key, option in dialog.options.items():
+        x = 0
+        if pos.x < mouse.x < pos.x + text_box_small_size.x and pos.y < mouse.y < pos.y + text_box_small_size.y:
+            x -= 2 * scale
+            # If you click on an option
+            if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_LEFT):
+                dialog_code, quest_status, end = dialog.on_click(key, quest_status)
 
-if answer == 2:
-    ["response dialog 2"]
-
-quest complete dialog
-
-dialog is a dict
-dialog = {
-    1: ("Thanks for completing the quest, here's your reward"),
-    0: ("What's taking so long, do you need something", ["tell me about the quest", "no"], [3, 6]),
-    2: ("this is the dialog", ["answer 1", "answer 2", "answer 3"], [3, 4, 5]),
-    3: ("this is the answer 1 dialog"),
-    4: ("this is the answer 2 dialog"),
-    5: ("this is the answer 3 dialog"),
-}
-"""
-current_text is an index
-if state.menu == "talking":
-    rl.draw_texture_ex("large_text_box")
-    rl.draw_text_ex(current_text)
-
-when click on person to talk sets current dialog
-
-create npc dataclass
-npc keeps track of current dialog
-when close text, it sets the dialog for the next time
-
-draw npc in the house
-put in list of npcs
-if standing next to npc and right click on them:
-    open text box with their name
-    display current dialog
-    display answer options, to close text box need to answer [bye]
-    answer options take a second to display to prevent accidental double clicking
-
-    if click on text box
-
-    if active quest from npc display certain option
-    if completed quest from npc and not given reward display ["I completed the quest"]
-        then should give reward, then update npc 
-    
-    when completed quest is moved to complted list, should update npc
-
-list of active quests
-each npc also needs to know what quest they have
-
-quest info should be in a file that has a dictionary of quests and their data. npc quest list is list of keys. when they
-give a quest, the info is retrieved from the dictionary and Quest object is created and put into active quest list
-
-Quest object has a key. When you click on on npc it checks if you have an active or completed quest with the same key as the one they
-assigned. when they give reward
-
-npc quests is a dict of keys to the quest and a true or false of whether they gave reward
+                if end:
+                    menu = ""
 
 
-"""
+
+                # if type(quest_option) == int:
+                #     # if you accepted a quest
+                #     if answer_code == quest_option:
+                #         quest_dialog = 0
+                #         quests.give_quest(available_quests, active_quests, quest_code)
+                #
+                # # new dialog
+                # dialog_code = codes[answer_code]
+                #
+                # # if conversation ends
+                # if dialog_code == 0:
+                #     menu = ""
+                #
+                #     # if quest has been accepted
+                #     if quest_dialog == 0:
+                #         # goes to default dialog
+                #         dialog_code = codes[answer_code + 1]
+                #
+                #     else:
+                #         # goes to quest dialog
+                #         dialog_code = quest_dialog
+                #
+
+        rl.draw_texture_ex(textures["text_box_small"], rl.Vector2(pos.x + x, pos.y), 0, scale, rl.WHITE)
+        rl.draw_text_ex(font, option, rl.Vector2(pos.x + x + text_box_small_margin.x, pos.y + text_box_small_margin.y), text_font_size, spacing, color)
+
+
+        if x == -2 * scale:
+            rl.draw_texture_ex(textures["text_box_small_highlight"], rl.Vector2(pos.x + x, pos.y), 0, scale, rl.WHITE)
+
+        pos.y += scale + text_box_small_size.y
+
+    return dialog_code, quest_status, menu
+
+
+def draw_dialog(menu: str, textures, font: rl.Font, npc: Npc, all_quests: dict[int, KillQuest]):
+    dialog = npc.dialogs[npc.dialog_code]
+    quest = all_quests[npc.quest_code]
+
+    # Draw text box and npc name
+    text = dialog.text
+    if npc.dialog_code in npc.variable_dialog:
+        text = get_new_text(text, quest)
+    draw_text_box(textures, font, npc.name, text)
+
+    options = []
+    codes = []
+
+    npc.dialog_code, quest.status, menu = draw_options(menu, textures, font, quest.status,
+                npc.quest_code, dialog, npc.dialog_code, options, codes, 1, 1)
+
+    return menu
+

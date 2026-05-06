@@ -1,6 +1,7 @@
 import pyray as rl
 from data.monsters import monster_data
 from ui_info import scale, text_font_size, spacing, color
+from quests import KillQuest
 
 center = rl.Vector2(rl.get_screen_width()//2, rl.get_screen_height()//2)
 offset = rl.Vector2(7 * scale, 2 * scale)
@@ -66,9 +67,11 @@ def draw_creature(font: rl.Font, textures, creature: str, kills: dict):
         count = kills[creature]
     rl.draw_text_ex(font, f"{count} kills", rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
 
-def draw_quests(font: rl.Font, active_quests: dict, completed_quests: dict):
+def draw_quests(font: rl.Font, active_quests: set, completed_quests: set, all_quests: dict[int, KillQuest]):
     # draw active quests
-    for quest in active_quests.values():
+    for code in active_quests:
+        quest = all_quests[code]
+
         monster_name = monster_data[quest.creature].name
         quest_name = f"{quest.type} {monster_name}"
 
@@ -79,8 +82,9 @@ def draw_quests(font: rl.Font, active_quests: dict, completed_quests: dict):
         name_size = rl.measure_text_ex(font, quest_name, text_font_size, spacing)
         pos.x += name_size.x + margin
 
+        # if quest is complete draw "talk to {npc name}" else draw kill count
         # Draw kill count
-        count = f"{quest.current_kills - quest.past_kills} / {quest.kill}"
+        count = f"{quest.kill_count} / {quest.kill}"
         rl.draw_text_ex(font, count, rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
         monster_size =  rl.measure_text_ex(font, count, text_font_size, spacing)
         pos.x += monster_size.x + margin//2
@@ -91,7 +95,8 @@ def draw_quests(font: rl.Font, active_quests: dict, completed_quests: dict):
         pos.y += 10 * scale
 
     # Draw Completed Quests
-    for quest in completed_quests.values():
+    for code in completed_quests:
+        quest = all_quests[code]
         monster_name = monster_data[quest.creature].name
         quest_name = f"{quest.type} {monster_name}"
 
@@ -103,14 +108,14 @@ def draw_quests(font: rl.Font, active_quests: dict, completed_quests: dict):
         pos.x += name_size.x + margin
 
 
-def draw_journal(textures, tab_view: str, font: rl.Font, kills: dict, active_quests: dict, completed_quests: dict) -> str:
+def draw_journal(textures, tab_view: str, font: rl.Font, kills: dict, active_quests: set, completed_quests: set, all_quests: dict[int, KillQuest]) -> str:
     rl.draw_texture_ex(textures["journal_pages"], rl.Vector2(journal_pos.x, journal_pos.y), 0, scale, rl.WHITE)
     tab_view = draw_tabs(textures, tab_view)
     if tab_view == "creatures":
         draw_creature(font, textures, "grass_tuft_weak", kills)
 
     if tab_view == "quests":
-        draw_quests(font, active_quests, completed_quests)
+        draw_quests(font, active_quests, completed_quests, all_quests)
 
     return tab_view
 

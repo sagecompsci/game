@@ -1,50 +1,75 @@
 from collections import namedtuple
 
-Monster = namedtuple("Monster", ["name", "description", "health", "defense", "strength", "attack_speed", "speed",
-                                 "stats", "drops", "locations"] )
+Monster = namedtuple("Monster", [
+    # printable name of monster
+    "name",
+    "description",
+    "health",
+    "defense",
+    "strength",
+    "attack_speed",
+    "speed",
+    "attack_range",
+    "combat_range",
+    "territory",
+    "stats",
+    "drops",
+    "locations"
+] )
+
 
 name = "Weed"
 weak_name = f"Weak {name}"
 strong_name = f"Strong {name}"
 
+
+weak_description = "Their stubborn roots reach far into the ground. Their attacks tickle more than they hurt."
 description = "Many blades of grass have formed a \"mighty\" colony. They give you paper cuts, which will be very irritating for many days.",
-weak_description = "A few blades of grass that have teamed up. Their attacks tickle more than they hurt."
 strong_description = "Dozens of colonies have come together under the rule of their glorious and beautiful leader, Dandelion."
 
 # weed? Their stubborn roots reach far into the ground
 
-health = 2
-weak_health = health/2
-strong_health = health * 2
+weak_health = 2
+health = 4
+strong_health = 2
 
+weak_defense = 0
 defense = 0
-weak_defense = defense
 strong_defense = 1
 
+weak_strength = 1
 strength = 2
-weak_strength = strength /2
-strong_strength = strength * 3
+strong_strength = 2
 
+weak_attack_speed = 1
 attack_speed = 1
-weak_attack_speed = attack_speed
-strong_attack_speed = attack_speed * 2
+strong_attack_speed = 1
 
-speed = 0
 weak_speed = 0
-strong_speed = 0
+speed = 0
+strong_speed = 1
 
-stats = {"health": 1}
-weak_stats = {"health": 1}
+weak_attack_range = 1
+attack_range = 1
+strong_attack_range = 2
+
+weak_territory = 0
+territory = 1
+strong_territory = 2
+
+weak_stats = {"health": .25}
+stats = {"health": .5}
 strong_stats = {"health": 2}
 
-drops = {"grass": 1}
 weak_drops = {}
-strong_drops = {"grass": 2, "dandelion": 1}
+drops = {"grass": 1}
+strong_drops = {"grass": 1, "dandelion": 1}
 
 locations = ["Everywhere under the open sky"]
 weak_locations = locations.copy()
 strong_locations = locations.copy()
 
+# requirements - 8 health
 
 weed_weak = Monster (
     name = weak_name,

@@ -8,11 +8,14 @@ class Quest:
     location: str
 
     rewards: dict
+
+    status: str - "", "accepted", "completed", "need-reward", "rewarded"
     """
     type: str
     giver: str
     location: str
     rewards: dict
+    status: str
 
 
 
@@ -32,9 +35,7 @@ class KillQuest(Quest):
     """
     creature: str
     kill: int
-    past_kills: int
-    current_kills: int
-    is_complete: bool
+    kill_count: int
     # for key, value(tuple?) in rewards.items():
     # type, count = value    ["inventory.armor chest", 1] ["inventory.items"] ["stat", 1]
     # if type = "inventory"
@@ -45,22 +46,56 @@ class KillQuest(Quest):
     # if type == "gold"
     #   state.gold += count
 
-    def set_complete(self):
-        if self.current_kills - self.past_kills == self.kill:
-            self.is_complete = True
+    def update_kills(self, creature, count):
+        if creature == self.creature:
+            self.kill_count += count
 
-# list of active quests that are not complete
-# list of completed quests
-# when kill monster, check every active quests for monster, if monster, set_complete
-# if quest.is_complete:
-# active.remove(quest)
-# complete.add(quest)
+
+    def set_complete(self):
+        if self.kill_count >= self.kill:
+            self.status = "completed"
 
 
 # eradicate quest, doesn't show how many monsters total, but must kill all in the area
 # gather/obtain quest - need to have certain number of items
 
-quests = {
+# function for determining if a quest is available and if it can be added to available list
+def set_available_quests(available_quests: set):
+    if not 1 in available_quests:
+        available_quests.add(1)
+
+
+def update_quests(available_quests: set, active_quests: set, completed_quests: set, all_quests: dict) :
+    accepted = set()
+    for code in available_quests:
+        quest = all_quests[code]
+        if quest.status == "accepted":
+            accepted.add(code)
+    available_quests -= accepted
+    active_quests.update(accepted)
+
+    rewarded = set()
+    for code in active_quests:
+        quest = all_quests[code]
+        if quest.status == "accepted":
+            quest.set_complete()
+        elif quest.status == "needs_reward":
+            # give reward
+            quest.status = "rewarded"
+            rewarded.add(code)
+    active_quests -= rewarded
+    completed_quests.update(rewarded)
+
+    return available_quests, active_quests, completed_quests
+
+
+def complete_quests(active_quests: set, all_quests: dict):
+    for code in active_quests:
+        quest = all_quests[code]
+
+
+
+all_quests = {
     1: KillQuest (
         type = "kill",
         giver = "Korra",
@@ -68,8 +103,7 @@ quests = {
         rewards = {"gold": ("gold", 10)},
         creature = "grass_tuft_weak",
         kill = 5,
-        past_kills = 0,
-        current_kills = 0,
-        is_complete = False,
+        kill_count = 0,
+        status = "",
     )
 }

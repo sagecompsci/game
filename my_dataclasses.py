@@ -176,6 +176,8 @@ class GameState:
 
     gold: int - amount of the gold the player has
 
+    quests: dict[str, set[int]] - "available", "active", "completed", keys for all_quests data
+
     kills: dict[str, int] - dictionary of kill count for each monster
 
     locations: str - current locations of player ex "map", "building", "cave"
@@ -211,6 +213,8 @@ class GameState:
 
     menu: str - which menu to view
 
+    npc: str - str pos of current npc talking to
+
     inv_view: str - which inventory tab to display
 
     font: rl.Font - global font
@@ -221,9 +225,8 @@ class GameState:
     player: Player
     inventory: dict[str, dict[str, InventoryItem]]
     gold: int
-    available_quests: dict
-    active_quests: dict
-    completed_quests: dict
+    quests: dict[str, set[int]]
+    all_quests: dict
     kills: dict[str, int]
     level: str
     location: str
@@ -238,6 +241,7 @@ class GameState:
     time: int
     last_movement: int
     menu: str
+    npc: str
     inv_view: str
     journal_tab_view: str
     font: rl.Font

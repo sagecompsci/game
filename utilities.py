@@ -137,3 +137,76 @@ def create_entity(name: str) -> Entity:
     )
 
 
+def get_adjacent_tiles(view: dict, player_pos: rl.Vector2, tile_size) -> list:
+    tiles = []
+    key = v2_str(rl.Vector2(player_pos.x, player_pos.y))
+    directions = view["tiles"][key][0].directions
+    for direction in directions:
+        pos = pos_from_direction(tile_size, direction, rl.Vector2(player_pos.x, player_pos.y))
+        tiles.append(v2_str(rl.Vector2(pos.x, pos.y)))
+    return tiles
+
+def is_mouse_on_tile(camera: rl.Camera2D, tile_key: str, tile_size: float) -> bool:
+    screen_mouse = rl.get_mouse_position()
+    mouse = rl.get_screen_to_world_2d(screen_mouse, camera)
+    pos = str_v2(tile_key)
+
+    if pos.x < mouse.x < pos.x + tile_size and pos.y < mouse.y < pos.y + tile_size:
+        return True
+
+    return False
+
+
+def wrap_lines(font: rl.Font, text: str, font_size: float, spacing: float, text_width: int) -> list[str]:
+    lines_list = []
+    lines = []
+    text_size = rl.measure_text_ex(font, text, font_size, spacing)
+    if text_size.x > text_width:
+        words = text.split(" ")
+        line = []
+        while len(words) > 0:
+            if not line:
+                line.append(words[0])
+                words.pop(0)
+                while True:
+                    if len(words) <= 0:
+                        lines_list.append(line.copy())
+                        break
+
+                    line.append(words[0])
+                    if rl.measure_text_ex(font, " ".join(line), font_size, spacing).x > text_width:
+                        line.pop(-1)
+                        lines_list.append(line.copy())
+                        line = []
+                        break
+
+                    else:
+                        words.pop(0)
+
+    else:
+        lines = [text]
+
+    for line in lines_list:
+        lines.append(" ".join(line))
+
+    return lines
+
+def draw_wrapped_text(font: rl.Font, lines: list[str], pos: rl.Vector2, font_size, spacing, color, centered: bool = False):
+    pos = rl.Vector2(pos.x, pos.y)
+    line_size = rl.Vector2(0, 0)
+    x = 0
+    for line in lines:
+        line_size = rl.measure_text_ex(font, line, font_size, spacing)
+        x = 0
+        if centered:
+            x -= line_size.x//2
+
+        rl.draw_text_ex(font, line, rl.Vector2(pos.x + x, pos.y),font_size, spacing, color)
+        pos.y += line_size.y + line_size.y // 4
+
+    return rl.Vector2(line_size.x, line_size.y), rl.Vector2(pos.x + x, pos.y)
+
+def give_quest(available_quests: dict, active_quests: dict, quest_code: int):
+    if quest_code in available_quests.keys():
+        active_quests[quest_code] = available_quests[quest_code]
+        available_quests.pop(quest_code)

@@ -8,9 +8,11 @@ import gameplay
 import create_menus
 import utilities as u
 import menu
+import quests
 import inventory
 import journal
-from quests import quests
+import dialog
+from quests import all_quests
 
 def init():
     rl.init_window(1800, 900, "Maze")
@@ -21,8 +23,8 @@ def init():
         player = Player(
             pos = rl.Vector2(0, 0),
             image = "player",
-            health = 50,
-            max_health = 100,
+            health = 5,
+            max_health = 5,
             defense = 0,
             strength = 1,
             attack_speed = 1,
@@ -46,31 +48,21 @@ def init():
             "special": {},
         },
         gold = 0,
-        available_quests = {},
-        active_quests = quests,
-        completed_quests = {},
+        quests = {
+            "available": set(),
+            "active": set(),
+            "completed": set(),
+        },
+        all_quests = all_quests,
         kills = {},
         level = "one",
         location = "levels",
         view = {},
         levels = {
-            "one": {
-                "tiles": {},
-                "monsters": {},
-                "chests": {},
-                "doors": {
-                    "pos1": {
-                        "tiles": {},
-                        "monsters": {},
-                        "chests": {},
-                    }
-                }
+            "one": {}
             },
-            "two": {},
-        },
         buildings = {
             "one": {},
-            "two": {},
         },
         tile_size = 8,
         scale = 3,
@@ -80,6 +72,7 @@ def init():
         time = 0,
         last_movement = 0,
         menu = "main",
+        npc = "",
         inv_view = "weapons",
         journal_tab_view = "creatures",
         font = rl.get_font_default() ,
@@ -99,8 +92,11 @@ def init():
 
     state.font = rl.load_font_ex("font.ttf", 50, None, 0)
 
+    state.quests["available"].add(1)
+
     reload(inventory)
     reload(journal)
+    reload(dialog)
 
     return state
 
@@ -117,7 +113,7 @@ def main():
         if rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
             pass
 
-        if state.menu in ("", "inventory", "journal"):
+        if state.menu in ("", "inventory", "journal", "dialog"):
             gameplay.game_loop(state)
         else:
             menu.menu(state, main_title, main_buttons, load_buttons, new_button, pause_buttons)

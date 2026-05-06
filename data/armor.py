@@ -1,6 +1,21 @@
 from collections import namedtuple
 Armor = namedtuple("Armor", ["name", "description", "type", "effects", "requirements", "locations"])
 
+# inventory type . subtype
+# equipable.head
+# equipable.ring
+# armor = ["head", "chest", "legs", "feet"]
+# rings = ["rings"]
+# bracelets = ["bracelets"]
+# necklaces = ["necklaces"]
+# weapons = ["weapons"]
+# accessories = rings + bracelets + necklaces
+# equipables = armor + rings
+#
+# different item description for items, consumables, special
+# move ingrediants out of consumables
+
+
 armor = "armor"
 head = "armor head"
 chest = "armor chest"

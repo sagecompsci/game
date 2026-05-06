@@ -7,14 +7,6 @@ import utilities as u
 
 
 
-def get_adjacent_tiles(view: dict, player_pos: rl.Vector2, tile_size) -> list:
-    tiles = []
-    key = u.v2_str(rl.Vector2(player_pos.x, player_pos.y))
-    directions = view["tiles"][key][0].directions
-    for direction in directions:
-        pos = u.pos_from_direction(tile_size, direction, rl.Vector2(player_pos.x, player_pos.y))
-        tiles.append(u.v2_str(rl.Vector2(pos.x, pos.y)))
-    return tiles
 
 
 def open_chest(inventory: dict, view: dict, player_pos: rl.Vector2):
@@ -41,9 +33,9 @@ def attack_monster(player: Player, monster: Entity, time: int):
 
 
 def fight_monster(inventory: dict, player: Player, monsters: dict, view: dict, tile_size: int, time: int, kills,
-    active_quests: dict[int, KillQuest], completed_quests):
+    active_quests: set, all_quests: dict[int, KillQuest]):
 
-    adjacent_tiles = get_adjacent_tiles(view, rl.Vector2(player.pos.x, player.pos.y), tile_size)
+    adjacent_tiles = u.get_adjacent_tiles(view, rl.Vector2(player.pos.x, player.pos.y), tile_size)
     for key in adjacent_tiles:
         if key in monsters.keys():
             monster = monsters[key]
@@ -53,6 +45,7 @@ def fight_monster(inventory: dict, player: Player, monsters: dict, view: dict, t
                     print("you died")
                 else:
                     attack_monster(player, monster, time)
+
             else:
                 attack_monster(player, monster, time)
                 if monster.health > 0:
@@ -74,18 +67,21 @@ def fight_monster(inventory: dict, player: Player, monsters: dict, view: dict, t
                 else:
                     kills[name] = 1
 
-                completed = []
-                for code, quest in active_quests.items():
-                    if quest.type == "kill":
-                        if quest.creature == name:
-                            quest.current_kills += 1
-                            quest.set_complete()
-
-                            if quest.is_complete:
-                                completed.append((code, quest))
-                for code, quest in completed:
-                    completed_quests[code] = quest
-                    active_quests.pop(code)
+                for code in active_quests:
+                    quest = all_quests[code]
+                    quest.update_kills(name, 1)
+                # completed = []
+                # for code, quest in active_quests.items():
+                #     if quest.type == "kill":
+                #         if quest.creature == name:
+                #             quest.current_kills += 1
+                #             quest.set_complete()
+                #
+                #             if quest.is_complete:
+                #                 completed.append((code, quest))
+                # for code, quest in completed:
+                #     completed_quests[code] = quest
+                #     active_quests.pop(code)
 
 def update_movement(player: Player, view: dict, buildings: dict, levels: dict, level: str, location: str, tile_size) -> tuple[dict, str]:
     direction = ""
@@ -106,7 +102,11 @@ def update_movement(player: Player, view: dict, buildings: dict, levels: dict, l
 
     if direction in view["tiles"][key][0].directions:
         monsters = view["monsters"]
-        if not key2 in monsters:
+        npcs = {}
+        if "npcs" in view.keys():
+            npcs = view["npcs"]
+        if not key2 in monsters.keys() and not key2 in npcs.keys():
+
             player.pos = rl.Vector2(pos2.x, pos2.y)
             # for key in get_adjacent_tiles(view, rl.Vector2(player.pos.x, player.pos.y), tile_size):
             #     if key in monsters.keys():

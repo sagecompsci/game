@@ -4,9 +4,11 @@ import math
 from my_dataclasses import GameState, Entity, Tile
 import utilities as u
 from save import save
-import inventory
 import movement
-import journal
+from inventory import draw_inventory
+from journal import draw_journal
+from dialog import draw_dialog
+import quests
 
 
 
@@ -35,16 +37,22 @@ def draw(view: dict, textures: dict[str, rl.Texture], player_pos: rl.Vector2, ti
             pos = u.rotate(tile_size, rl.Vector2(pos.x, pos.y), tile.rotation)
             rl.draw_texture_ex(textures[tile.name], pos, tile.rotation, scale, rl.WHITE)
 
-    chests = view["chests"]
-    for key in chests.keys():
-        rotation = chests[key].rotation
-        pos = chests[key].rotate_pos
+    if "chests" in view.keys():
+        chests = view["chests"]
+        for key in chests.keys():
+            rotation = chests[key].rotation
+            pos = chests[key].rotate_pos
 
-        rl.draw_texture_ex(textures["chest"], pos, rotation, scale, rl.WHITE)
+            rl.draw_texture_ex(textures["chest"], pos, rotation, scale, rl.WHITE)
 
-    for key, monster in view["monsters"].items():
-        rl.draw_texture_ex(textures[monster.image], u.str_v2(key), 0, scale, rl.WHITE)
-        draw_monster_health(tile_size, scale, monster, key)
+    if "monsters" in view.keys():
+        for key, monster in view["monsters"].items():
+            rl.draw_texture_ex(textures[monster.image], u.str_v2(key), 0, scale, rl.WHITE)
+            draw_monster_health(tile_size, scale, monster, key)
+
+    if "npcs" in view.keys():
+        for key, npc in view["npcs"].items():
+            rl.draw_texture_ex(textures[npc.image], u.str_v2(key), 0, scale, rl.WHITE)
 
     rl.draw_texture_ex(textures["player"], player_pos, 0, scale, rl.WHITE)
 
@@ -104,7 +112,12 @@ def game_loop(state: GameState):
         elif state.menu == "journal":
             state.menu = ""
 
-    elif rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
+    # if rl.is_key_pressed(rl.KeyboardKey.KEY_Q):
+    #     if state.available_quests:
+    #         code = 1
+    #         state.active_quests[code] = state.available_quests[code]
+
+    if rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
         if state.menu in ("journal", "inventory"):
             state.menu = ""
         else:
@@ -112,6 +125,8 @@ def game_loop(state: GameState):
 
     if rl.is_key_pressed(rl.KeyboardKey.KEY_G):
         p.health = p.max_health
+
+
 
     state.time += 1
 
@@ -127,7 +142,7 @@ def game_loop(state: GameState):
     if state.menu == "":
         movement.open_chest(state.inventory, state.view, p.pos)
         movement.fight_monster(state.inventory, p, state.view["monsters"], state.view, state.tile_size, state.time,
-                               state.kills, state.active_quests, state.completed_quests)
+                               state.kills, state.quests["active"], state.all_quests)
 
 
         if state.time - state.last_movement > p.speed * 10:
@@ -136,7 +151,8 @@ def game_loop(state: GameState):
             state.camera.target = rl.Vector2(p.pos.x, p.pos.y)
             # keep track of last time of movement, if greater than 7 then walk
 
-
+    state.quests["available"], state.quests["active"], state.quests["completed"] = (
+        quests.update_quests(state.quests["available"], state.quests["active"], state.quests["completed"], state.all_quests))
 
 
 
@@ -145,19 +161,29 @@ def game_loop(state: GameState):
 
     rl.begin_mode_2d(state.camera)
 
-    draw(state.view, state.textures, state.player.pos, state.tile_size, state.scale)
+    if rl.is_mouse_button_pressed(rl.MouseButton.MOUSE_BUTTON_RIGHT):
+        if "npcs" in state.view.keys():
+            for key, npc in state.view["npcs"].items():
+                if u.is_mouse_on_tile(state.camera, key, state.tile_size):
+                    state.menu = "dialog"
+                    state.npc = key
 
+    draw(state.view, state.textures, state.player.pos, state.tile_size, state.scale)
 
 
     rl.end_mode_2d()
 
     draw_player_health(state.font, state.textures, state.player.health + state.player.bonus_health, state.player.max_health + state.player.bonus_health)
     if state.menu == "inventory":
-        state.inv_view, is_journal = inventory.draw_inventory(state.font, state.font_size, state.player, state.inventory, state.gold, state.textures, state.inv_view)
+        state.inv_view, is_journal = draw_inventory(state.font, state.font_size, state.player, state.inventory, state.gold, state.textures, state.inv_view)
         if is_journal:
             state.menu = "journal"
 
     if state.menu == "journal":
-        state.journal_tab_view = journal.draw_journal(state.textures, state.journal_tab_view, state.font, state.kills, state.active_quests, state.completed_quests)
+        state.journal_tab_view = draw_journal(state.textures, state.journal_tab_view, state.font, state.kills, state.quests["active"], state.quests["completed"], state.all_quests)
+        pass
+
+    if state.menu == "dialog":
+        state.menu = draw_dialog(state.menu, state.textures, state.font, state.view["npcs"][state.npc], state.all_quests)
 
     rl.end_drawing()

@@ -1,9 +1,21 @@
-def nothing(): pass
+pass
 
 """
- - create monster killing quest
  - craft cooked drumstick
+ - craft armor
  - more ui info
+ - item that gives +1 health
+ - stick weapon +1 strength
+ - grass armor +1 health each
+ - armor bonuses
+    - grass +1 defense 
+    - bonuses = {int_code: ["stat": 1, "stat2": 1]
+    - if 4 of same number in equips, get bonus
+- grass gloves weapon + 1 strength
+- file that keeps track of if each menu is gameplay loop or should display menu
+    - also keeps track of if item types should display equips description or item description
+- in journal, quest should no longer show count if you killed them all
+    
 
                                  
 to-do
@@ -20,26 +32,6 @@ to-do
         - create accessories inventory
 
     
-    - wake up by a silver tree.
-    - after you get certain number of tiles away you come across an injured centaur
-        - gives you quest, their caravan was attacked by a pack of wolves and they need help
-        - they ask you to go to the nearest village and find help, village shows up on map, and they give you directions
-        - centaurs gives you flint, wood, and some food
-    - once you get to village you talk to guards and tell them what happened
-    - you go with the guards back to the centaur camp
-    - the healer gives another quest to ask if you can gather some materials
-    - healer gives you recipe for medicinal brew
-    - if you don't accept the first quest everyone dies
-    - if you don't accept the second quest some die
-
-- wake up in a bed in the village
-- leave the room/house to find someone
-
-    - you were found passed out in the field? what happened?
-    - I don't remember anything
-    - maybe if you make it to the bottom you can wish for your memories back
-- kill weeds in an abandoned house. Give food to take. There is one regular weed
-    - in return i'll show you how to craft simple items
 
 general 
     - floors are in upside pyramid, floors get smaller as you go down
@@ -55,12 +47,16 @@ general
 
 monsters
     - monsters respawn in the morning?? or at night or something
-    - weak monster   drop 1
-    - monster   drop 1 and 2
-    - strong monster   drop 1, 2, and three
+    - weak monster, monster, strong monster
     - monster king     special drop
-        - monster king is only summoned after a certain number of that monster is killed
+        - monster king is only summoned after a certain number of strong monster is killed
         - king drop can be crafted into rings that repel or attract that kind of monster
+    
+    - each monster has a stat requirement before it can be spawned. Could be stat total or certain stat
+    - after a certain number killed or certain stat, weak don't spawn, medium also stop spawning, strong and king will
+        always spawn no matter how strong you get
+    
+    - some way of leveling up their stats even more after you get way overpowered
     
     - monster following behavior
         - monsters should follow behind other monsters if chasing player. 
@@ -69,7 +65,8 @@ monsters
 
 level system
     - each monster gives a stat when you kill it
-    - somewhere displays total number of stats with or without inventory items
+    - somewhere displays total number of base stats and then totals stats gained by items
+        - total base stats:    total bonus stats: 
 
 stats
     - health
@@ -84,12 +81,42 @@ stats
     - speed
         - effects walking speed
 
+- armor bonuses
+    - if 4 armor equips of same code, get stat bonus
+    - some armors can mix and match and belong to multiple different bonus categories
+    
+- death penalty
+    - lose money on death. if go into debt, you cannot earn money until the debt is gone, shows at negative money in inv
+    - if die near village wake up in a bed
+    - stone "monument" respawn points.
+        - "The gods demand money"
+    - lose percent of "common" items
+    - start at 5 or 10%
+        - goes up to 30% as your stat total gets higher
+        - if at 10%, if have 10, lose 1, if have 9, don't lose any
+    
 fighting
-    - when you are adjacent to a monster you will automatically attack, monster will automatically attack you
-    - entity attacks with attack power every certain number of seconds. (will also show damage per second)
-    - crit attack??
-    - if there are multiple enemies can choose which to attack first by clicking on them
-    - can't attack if walking
+    - turn based
+    - options
+        - attack - should show attack dealt
+        - heal
+            - can only take potions
+            - cannot eat during combat
+        - defend - should show defense num
+            - gain certain percent of your defence
+        - move
+            - if monster move speed is greater, take percent of damage. the faster, the more damage
+            - if you are faster than the monster you can deal a small amount of damage before moving
+            - if certain amount of tiles away, combat stops
+            
+    - other monsters can move towards you while you are fighting, so you can end up surrouned. 
+        - if you are adjacent to multiple monsters, they will all deal damage to you, but you can only deal damage to one
+    - creatures have certain attack patterns and other moves they can make
+        - for example [attack, build strength, strong attack] on repeat
+    - higher attack speed goes first, if same, player goes first
+    - attack speed represents number of turns. 
+        - if player is 3 and creature is 4, creature will attack 4 times, in the space that player attacks 3
+                
 
 inventory 
     - large inventory. gets bigger somehow

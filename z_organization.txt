@@ -1,0 +1,84 @@
+each dataclass gets its own file that only has that dataclass
+files that initialize monsters, quests, npcs, items
+
+fight monsters needs its own file
+
+each item, monster gets its own file
+then one big files that grabs everything
+function that reads each file in "creatures/aggressive" and then initializes them
+when you need to look up an item should just look up the file
+same for items
+
+# Data file info
+# images should follow the same structure
+data files should be .json
+data
+    creatures
+        aggressive
+            grass_tuft
+                - common
+                - grass_tuft_weak
+                - grass_tuft
+                - grass_tuft_strong
+        neutral
+        passive
+
+    inventory
+        equipables
+            weapons
+            armor
+                head
+                chest
+                legs
+                feet
+            accessories
+                necklaces
+                bracelets
+                rings
+        items
+        consumables
+        special
+        quest?
+    Quests
+        - 1
+        - 2
+        - 3
+    Npcs
+
+
+one? file for ui data
+ui
+    general
+        - draw_ui(menu)
+            all code for determining what ui to draw or do goes here
+    inventory
+    main_menu
+    journal
+    etc
+
+-main
+    - gameplay
+        - draw game
+        - fight
+
+
+quest should be a dict of [quest_code: Quest]
+    status should be enum
+
+all       - every quest that exists
+available - some quests have a requirement before they can be moved from all to available
+    status = ""
+active    - "complete" status quests need to talk to npc before they can be moved to "needs_reward"
+    status = "accepted", "completed", "needs_reward"
+completed - quests give reward then change to "rewarded"
+    status = "rewarded"
+
+
+accept quest
+    - quest is moved to active quests and status changed to "accepted"
+complete quest
+    - quest status is changed to "completed"
+report to npc
+    - quest status is changed to "needs_reward"
+    - function checks all "needs_reward" quests and gives reward
+    - quest is moved to completed and status changed to "rewarded"

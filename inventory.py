@@ -192,53 +192,6 @@ def draw_items(font: rl.Font, font_size: float, player: Player, inventory: dict,
 
     return desc_item, journal
 
-def wrap_lines(font: rl.Font, text: str, font_size: float, text_width: int) -> list[str]:
-    lines_list = []
-    lines = []
-    text_size = rl.measure_text_ex(font, text, font_size, spacing)
-    if text_size.x > text_width:
-        words = text.split(" ")
-        line = []
-        while len(words) > 0:
-            if not line:
-                line.append(words[0])
-                words.pop(0)
-                while True:
-                    if len(words) <= 0:
-                        lines_list.append(line.copy())
-                        break
-
-                    line.append(words[0])
-                    if rl.measure_text_ex(font, " ".join(line), font_size, spacing).x > text_width:
-                        line.pop(-1)
-                        lines_list.append(line.copy())
-                        line = []
-                        break
-
-                    else:
-                        words.pop(0)
-
-    else:
-        lines = [text]
-
-    for line in lines_list:
-        lines.append(" ".join(line))
-
-    return lines
-
-def draw_wrapped_text(font: rl.Font, lines: list[str], pos: rl.Vector2, font_size, spacing, centered: bool = False):
-    line_size = rl.Vector2(0, 0)
-    x = 0
-    for line in lines:
-        line_size = rl.measure_text_ex(font, line, font_size, spacing)
-        x = 0
-        if centered:
-            x -= line_size.x//2
-
-        rl.draw_text_ex(font, line, rl.Vector2(pos.x + x, pos.y),font_size, spacing, rl.BLACK)
-        pos.y += line_size.y + line_size.y // 4
-
-    return rl.Vector2(line_size.x, line_size.y), rl.Vector2(pos.x + x, pos.y)
 
 
 def draw_description(font: rl.Font, font_size: float, text_font_size: float, textures: dict, item_name: str):
@@ -263,13 +216,13 @@ def draw_description(font: rl.Font, font_size: float, text_font_size: float, tex
         # Draw Item Name
         name_size = rl.measure_text_ex(font, item.name, font_size, spacing)
         name_pos = rl.Vector2(text_start.x + text_area.x//2, text_start.y)
-        lines = wrap_lines(font, item.name, font_size, int(text_area.x))
-        draw_wrapped_text(font, lines, rl.Vector2(name_pos.x, name_pos.y), font_size, spacing, True)
+        lines = u.wrap_lines(font, item.name, font_size, spacing, int(text_area.x))
+        u.draw_wrapped_text(font, lines, rl.Vector2(name_pos.x, name_pos.y), font_size, spacing, color,True)
 
         # Draw Description
         text_pos = rl.Vector2(text_start.x + text_area.x//2, name_pos.y + name_size.y + name_size.y//4)
-        lines = wrap_lines(font, item.description, text_font_size, int(text_area.x))
-        line_size, line_pos = draw_wrapped_text(font, lines, rl.Vector2(text_pos.x, text_pos.y), text_font_size, spacing, True)
+        lines = u.wrap_lines(font, item.description, text_font_size, spacing, int(text_area.x))
+        line_size, line_pos = u.draw_wrapped_text(font, lines, rl.Vector2(text_pos.x, text_pos.y), text_font_size, spacing, color, True)
         y_margin = line_size.y + line_size.y // 4
         pos = rl.Vector2(text_start.x, line_pos.y + y_margin * 1.5)
 
