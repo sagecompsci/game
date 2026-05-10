@@ -1,0 +1,11 @@
+{
+    "name": "Grass Sash",
+    "description": "A simple sash made from woven grass",
+    "effects": {
+        "health": 1
+    },
+    "requirements": {},
+    "locations": [],
+    "type": "chest",
+    "inventory": "armor"
+}

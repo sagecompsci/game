@@ -1,0 +1,13 @@
+{
+    "name": "Cooked Drumstick",
+    "description": "A drumstick that has been cooked over a fire. It looks very appetizing",
+    "effects": {
+        "health": 3
+    },
+    "locations": [
+        "cooking",
+        "npcs"
+    ],
+    "type": "food",
+    "inventory": "consumables"
+}

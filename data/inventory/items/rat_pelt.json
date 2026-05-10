@@ -1,0 +1,12 @@
+{
+    "name": "Rat Pelt",
+    "description": "The pelt of a rat.",
+    "uses": [
+        "craft"
+    ],
+    "locations": [
+        "drops: rat"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

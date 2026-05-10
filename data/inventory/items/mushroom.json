@@ -1,0 +1,12 @@
+{
+    "name": "Mushroom",
+    "description": "A brightly colored mushroom, I wonder if it's poisonous...",
+    "uses": [
+        "cooking"
+    ],
+    "locations": [
+        "drops: stumpling_strong"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

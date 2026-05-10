@@ -1,0 +1,21 @@
+{
+    "name": "Weed",
+    "description": "Many blades of grass have formed a \"mighty\" colony. They give you paper cuts, which will be very irritating for many days.",
+    "health": 4,
+    "defense": 0,
+    "strength": 2,
+    "attack_speed": 1,
+    "speed": 0,
+    "attack_range": 1,
+    "territory": 1,
+    "combat_range": 1,
+    "stats": {
+        "health": 0.5
+    },
+    "drops": {
+        "grass": 1
+    },
+    "locations": [
+        "Only in the most neglected areas."
+    ]
+}

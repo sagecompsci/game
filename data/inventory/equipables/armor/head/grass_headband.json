@@ -1,0 +1,11 @@
+{
+    "name": "Grass Headband",
+    "description": "A simple headband made from woven grass.",
+    "effects": {
+        "health": 1
+    },
+    "requirements": {},
+    "locations": [],
+    "type": "head",
+    "inventory": "armor"
+}

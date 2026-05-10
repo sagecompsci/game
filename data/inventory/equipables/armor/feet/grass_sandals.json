@@ -1,0 +1,11 @@
+{
+    "name": "Grass Sandals",
+    "description": "Simple sandals made from woven grass. They aren't very comfortable, but they're better than nothing",
+    "effects": {
+        "health": 1
+    },
+    "requirements": {},
+    "locations": [],
+    "type": "feet",
+    "inventory": "armor"
+}

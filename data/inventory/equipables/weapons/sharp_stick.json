@@ -1,0 +1,12 @@
+{
+    "name": "Sharp Stick",
+    "description": "A sharp stick useful for digging out small weeds.",
+    "effects": {
+        "strength": 1
+    },
+    "bonus": 0,
+    "requirements": {},
+    "locations": [],
+    "type": "weapons",
+    "inventory": "weapons"
+}

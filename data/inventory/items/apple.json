@@ -1,0 +1,12 @@
+{
+    "name": "Apple",
+    "description": "A sweet, red fruit.",
+    "uses": [
+        "cooking"
+    ],
+    "locations": [
+        "pickup"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

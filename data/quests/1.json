@@ -1,0 +1,10 @@
+{
+  "type": "kill",
+  "giver": "Korra",
+  "location": "Village",
+  "rewards": {
+    "gold": 10
+  },
+  "creature": "grass_tuft_weak",
+  "kill": 5
+}

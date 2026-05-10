@@ -1,0 +1,12 @@
+{
+    "name": "Porcupine Quill",
+    "description": "A sharp quill from a porcupine.",
+    "uses": [
+        "craft"
+    ],
+    "locations": [
+        "drops: porcupine"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

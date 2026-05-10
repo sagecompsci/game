@@ -1,10 +1,9 @@
-import os
 import pyray as rl
-import random
 
-from my_dataclasses import GameState, Tile, Entity, Building
+from classes.Tile import Tile
 from generate_levels.layouts.layout_one import get_layout
-import utilities as u
+from utilities import utilities as u
+
 
 def opposite_direction(direction: str) -> str:
     if direction == "north":
@@ -115,7 +114,7 @@ def create_level(tile_size: int, map_size: int) -> tuple[rl.Vector2, dict, dict,
     chests = {}
     center = map_size//2 * tile_size
     # start_pos = rl.Vector2(center, center)
-    start_pos = rl.Vector2(144,240)
+    start_pos = rl.Vector2(center,center)
     doors = {}
     building_tiles = []
     end = (map_size * tile_size) - tile_size
@@ -125,8 +124,8 @@ def create_level(tile_size: int, map_size: int) -> tuple[rl.Vector2, dict, dict,
             pos = rl.Vector2(x * tile_size, y * tile_size)
             key = u.v2_str(rl.Vector2(pos.x, pos.y))
 
-            if x < map_size and y == 0:
-                monsters[key] = u.create_entity("grass_tuft_weak")
+            # if x < map_size and y == 0:
+            #     monsters[key] = u.create_entity("grass_tuft_weak")
 
             level[key] = [create_tile(rl.Vector2(pos.x, pos.y), "grass_tile", tile_size, rl.Vector2(0, 0), rl.Vector2(end_pos.x, end_pos.x), level, building_tiles)]
 
@@ -135,10 +134,6 @@ def create_level(tile_size: int, map_size: int) -> tuple[rl.Vector2, dict, dict,
                 building_tiles.extend(tiles)
                 level[key].append(building)
                 doors.update(door)
-
-
-
-
 
 
 

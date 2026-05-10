@@ -1,0 +1,10 @@
+{
+    "name": "Amulet",
+    "description": "A cheap, common amulet",
+    "effects": {},
+    "requirements": {},
+    "bonus": 0,
+    "locations": [],
+    "type": "necklaces",
+    "inventory": "accessories"
+}

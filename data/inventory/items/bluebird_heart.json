@@ -1,0 +1,12 @@
+{
+    "name": "Bluebird Heart",
+    "description": "The heart of a bluebird",
+    "uses": [
+        "potion"
+    ],
+    "locations": [
+        "drops: bluebird_strong"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

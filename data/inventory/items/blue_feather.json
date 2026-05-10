@@ -1,0 +1,12 @@
+{
+    "name": "Blue Feather",
+    "description": "The most beautiful feather you have ever seen. It seems to hold the essence of the color blue.",
+    "uses": [
+        "crafting"
+    ],
+    "locations": [
+        "drops: bluebird_king"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

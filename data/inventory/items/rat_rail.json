@@ -1,0 +1,12 @@
+{
+    "name": "Rat Tail",
+    "description": "The tail of a rat.",
+    "uses": [
+        "craft"
+    ],
+    "locations": [
+        "drops: rat_strong"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

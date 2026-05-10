@@ -2,7 +2,7 @@ import pyray as rl
 import os
 
 import utilities as u
-from my_dataclasses import Button
+from classes.my_dataclasses import Button
 
 
 scale = 2

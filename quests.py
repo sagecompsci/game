@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from classes.Enum import Status
 
 @dataclass
 class Quest:
@@ -15,7 +16,7 @@ class Quest:
     giver: str
     location: str
     rewards: dict
-    status: str
+    status: Status
 
 
 
@@ -53,7 +54,7 @@ class KillQuest(Quest):
 
     def set_complete(self):
         if self.kill_count >= self.kill:
-            self.status = "completed"
+            self.is_complete = True
 
 
 # eradicate quest, doesn't show how many monsters total, but must kill all in the area

@@ -1,0 +1,12 @@
+{
+    "name": "Wood",
+    "description": "A sturdy chunk of wood. I bet you could make something with this.",
+    "uses": [
+        "craft"
+    ],
+    "locations": [
+        "drops: stumpling_weak"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

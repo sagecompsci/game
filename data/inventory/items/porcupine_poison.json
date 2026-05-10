@@ -1,0 +1,12 @@
+{
+    "name": "Porcupine Poison",
+    "description": "Poison from the quill of a porcupine.",
+    "uses": [
+        "craft deadly weapon or poison"
+    ],
+    "locations": [
+        "drops: porcupine_king"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

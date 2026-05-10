@@ -1,9 +1,11 @@
 import pyray as rl
 import math
 
-from my_dataclasses import Entity, Player
+from classes.Player import Player
+from classes.Entity import Entity
 from quests import KillQuest
-import utilities as u
+# import utilities.utilities as u
+from utilities import utilities as u
 
 
 
@@ -83,7 +85,7 @@ def fight_monster(inventory: dict, player: Player, monsters: dict, view: dict, t
                 #     completed_quests[code] = quest
                 #     active_quests.pop(code)
 
-def update_movement(player: Player, view: dict, buildings: dict, levels: dict, level: str, location: str, tile_size) -> tuple[dict, str]:
+def update_movement(player: Player, map: dict, buildings: dict, levels: dict, level: str, location: str, tile_size) -> tuple[dict, str]:
     direction = ""
     if rl.is_key_down(rl.KeyboardKey.KEY_W):
         direction = "north"
@@ -100,33 +102,23 @@ def update_movement(player: Player, view: dict, buildings: dict, levels: dict, l
     pos2 = u.pos_from_direction(tile_size, direction, rl.Vector2(player.pos.x, player.pos.y))
     key2 = u.v2_str(rl.Vector2(pos2.x, pos2.y))
 
-    if direction in view["tiles"][key][0].directions:
-        monsters = view["monsters"]
+    if direction in map["tiles"][key][0].directions:
+        monsters = map["monsters"]
         npcs = {}
-        if "npcs" in view.keys():
-            npcs = view["npcs"]
+        if "npcs" in map.keys():
+            npcs = map["npcs"]
         if not key2 in monsters.keys() and not key2 in npcs.keys():
-
             player.pos = rl.Vector2(pos2.x, pos2.y)
-            # for key in get_adjacent_tiles(view, rl.Vector2(player.pos.x, player.pos.y), tile_size):
-            #     if key in monsters.keys():
-            #         if monsters[key].speed > 0:
-            #             monster_pos = (rl.Vector2(player.pos.x, player.pos.y))
-            #             new_key = u.v2_str(rl.Vector2(monster_pos.x, monster_pos.y))
-            #             if not new_key in monsters.keys():
-            #                 monsters[new_key] = monsters[key]
-            #                 monsters.pop(key)
 
         if key2 in buildings[level].keys():
             if location == "levels":
-                view = buildings[level][key2]
+                map = buildings[level][key2]
                 location = "buildings"
             elif location == "buildings":
-                view = levels[level]
+                map = levels[level]
                 location = "levels"
 
             pos3 = u.pos_from_direction(tile_size, direction, rl.Vector2(pos2.x, pos2.y))
             player.pos = rl.Vector2(pos3.x, pos3.y)
 
-
-    return view, location
+    return map, location

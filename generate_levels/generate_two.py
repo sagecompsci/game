@@ -2,8 +2,8 @@ import pyray as rl
 import random
 from data.weapons import weapon_data
 
-import utilities as u
-from my_dataclasses import GameState, Tile
+from utilities import utilities as u
+from classes.my_dataclasses import GameState, Tile
 
 
 
@@ -257,7 +257,7 @@ def create_maze(state: GameState) -> tuple[dict, rl.Vector2, dict, dict]:
 
     start_pos = random.choice(dead_ends)
     dead_ends.remove(start_pos)
-    maze[u.v2_str(rl.Vector2(start_pos.x, start_pos.y))].name = "stair"
+    maze[u.v2_str(rl.Vector2(start_pos.x, start_pos.y))].key = "stair"
 
     chests, monsters = generate_chests_monsters(state, dead_ends, maze)
 

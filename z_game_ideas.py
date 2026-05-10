@@ -15,6 +15,10 @@ pass
 - file that keeps track of if each menu is gameplay loop or should display menu
     - also keeps track of if item types should display equips description or item description
 - in journal, quest should no longer show count if you killed them all
+- combat range for monster
+    - if out of combat range, will end combat
+    - after you move, the enemy moves, if they move back into combat range, combat continues
+
     
 
                                  
@@ -99,9 +103,11 @@ fighting
     - turn based
     - options
         - attack - should show attack dealt
-        - heal
-            - can only take potions
+        - potions
+            - can only take potions to heal
             - cannot eat during combat
+            - some potions give buffs for a number of turn or until the end of combat
+            - some potions give debuffs or deal poison damage
         - defend - should show defense num
             - gain certain percent of your defence
         - move
@@ -189,6 +195,12 @@ random
         - taking fire attacks with grass armor makes the armor catch on fire and deal extra damage
         - being in really hot place with metal armor eventually makes you take damage
         - mom's idea from alone when that guy used grass gloves to pick up pot and burned himself
+    - can choose if you would like to allow teleportation in the game?
+        - there are teleportation crystal and you have to leave them there if you want to be a able to teleport there later
+    - if you equip all 7 of the same ring you get an extra stat boost, doesn't tell you this anywhere, when you do it, 
+        there is a message that says "{whoever made the ring} is impressed with your devotion. They grant you {plus stat}"
+    
+    - some peaceful monsters are too fast to catch because they will run away 
 
 
 levels

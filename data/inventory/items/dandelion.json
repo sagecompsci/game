@@ -1,0 +1,12 @@
+{
+    "name": "Dandelion",
+    "description": "A beautiful dandelion.",
+    "uses": [
+        "crafting"
+    ],
+    "locations": [
+        "drops: weed_strong"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

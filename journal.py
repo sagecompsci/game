@@ -1,6 +1,6 @@
 import pyray as rl
-from data.monsters import monster_data
-from ui_info import scale, text_font_size, spacing, color
+# from data.monsters import monster_data
+from information.ui import scale, text_font_size, spacing, color
 from quests import KillQuest
 
 center = rl.Vector2(rl.get_screen_width()//2, rl.get_screen_height()//2)
@@ -58,7 +58,7 @@ def draw_creature(font: rl.Font, textures, creature: str, kills: dict):
 
     # Draw Name
     pos = rl.Vector2(picture_pos.x, picture_pos.y + picture_size.y + pic_offset)
-    rl.draw_text_ex(font, item.name, rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
+    rl.draw_text_ex(font, item.key, rl.Vector2(pos.x, pos.y), text_font_size, spacing, color)
     pos.y += quest_offset
 
     # Draw Count
@@ -72,7 +72,7 @@ def draw_quests(font: rl.Font, active_quests: set, completed_quests: set, all_qu
     for code in active_quests:
         quest = all_quests[code]
 
-        monster_name = monster_data[quest.creature].name
+        monster_name = monster_data[quest.creature].key
         quest_name = f"{quest.type} {monster_name}"
 
         margin = 3 * scale
@@ -97,7 +97,7 @@ def draw_quests(font: rl.Font, active_quests: set, completed_quests: set, all_qu
     # Draw Completed Quests
     for code in completed_quests:
         quest = all_quests[code]
-        monster_name = monster_data[quest.creature].name
+        monster_name = monster_data[quest.creature].key
         quest_name = f"{quest.type} {monster_name}"
 
         margin = 10 * scale

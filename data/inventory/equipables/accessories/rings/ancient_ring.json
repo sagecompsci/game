@@ -1,0 +1,12 @@
+{
+    "name": "Ancient Ring",
+    "description": "An old ring. It's covered in rust and dirt.",
+    "effects": {
+        "health": 1
+    },
+    "bonus": 0,
+    "requirements": {},
+    "locations": [],
+    "type": "rings",
+    "inventory": "accessories"
+}

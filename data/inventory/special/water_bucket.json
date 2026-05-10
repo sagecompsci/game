@@ -1,0 +1,6 @@
+{
+    "name": "Water Bucket",
+    "description": "A bucket of water from the well.",
+    "type": "special",
+    "inventory": "special"
+}

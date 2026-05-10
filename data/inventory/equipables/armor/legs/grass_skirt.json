@@ -1,0 +1,11 @@
+{
+    "name": "Grass Skirt",
+    "description": "A simple skirt made from woven grass.",
+    "effects": {
+        "health": 1
+    },
+    "requirements": {},
+    "locations": [],
+    "type": "legs",
+    "inventory": "armor"
+}

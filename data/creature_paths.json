@@ -1,0 +1,5 @@
+{
+    "weed": "data/creatures/aggressive/weed.json",
+    "weed_strong": "data/creatures/aggressive/weed_strong.json",
+    "weed_weak": "data/creatures/aggressive/weed_weak.json"
+}

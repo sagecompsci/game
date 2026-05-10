@@ -1,0 +1,6 @@
+{
+    "name": "Journal",
+    "description": "A brand new journal to record everything you see on your adventures.",
+    "type": "special",
+    "inventory": "special"
+}

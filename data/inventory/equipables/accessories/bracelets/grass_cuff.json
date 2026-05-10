@@ -1,0 +1,12 @@
+{
+    "name": "Grass Cuff",
+    "description": "A simple cuff made from woven grass, it's very itchy.",
+    "effects": {
+        "health": 1
+    },
+    "requirements": {},
+    "bonus": 0,
+    "locations": [],
+    "type": "bracelets",
+    "inventory": "accessories"
+}

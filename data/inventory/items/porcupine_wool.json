@@ -1,0 +1,12 @@
+{
+    "name": "Porcupine Wool",
+    "description": "Soft wool from a porcupine, it would keep you warm.",
+    "uses": [
+        "craft"
+    ],
+    "locations": [
+        "drops: porcupine_strong"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

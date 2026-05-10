@@ -1,0 +1,12 @@
+{
+    "name": "Raw Drumstick",
+    "description": "A raw drumstick. It need to be cooked before you can eat it.",
+    "uses": [
+        "cooking"
+    ],
+    "locations": [
+        "drops: bluebird_weak"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

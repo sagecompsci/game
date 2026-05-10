@@ -1,0 +1,6 @@
+{
+    "name": "Map",
+    "description": "An old map that doesn't show very much detail.",
+    "type": "special",
+    "inventory": "special"
+}

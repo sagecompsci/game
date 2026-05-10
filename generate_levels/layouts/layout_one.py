@@ -2,9 +2,10 @@ import os
 import pyray as rl
 import random
 
-import utilities as u
-from my_dataclasses import Tile
-from npcs import Npc, npc
+from utilities import utilities as u
+from utilities.get_data import get_npc
+from classes.Tile import Tile
+from classes.Npc import Npc
 
 def get_wall(tile_pos: rl.Vector2, x: int, y: int, size: int, tile_size: int, door_pos: rl.Vector2) -> dict:
     tiles = {}
@@ -73,7 +74,8 @@ def get_wall(tile_pos: rl.Vector2, x: int, y: int, size: int, tile_size: int, do
 
     return tiles
 
-def create_npc(tile_pos: str):
+def create_npc(tile_pos: str) -> Npc:
+    npc = get_npc(1)
     npc.pos = tile_pos
     return npc
 

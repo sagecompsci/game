@@ -1,0 +1,6 @@
+{
+    "name": "Flint",
+    "description": "You could use this to start a fire.",
+    "type": "special",
+    "inventory": "special"
+}

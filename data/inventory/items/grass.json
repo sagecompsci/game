@@ -1,0 +1,12 @@
+{
+    "name": "Grass",
+    "description": "This grass seems tougher than normal, maybe you could craft something with it.",
+    "uses": [
+        "crafting"
+    ],
+    "locations": [
+        "drops: weed"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

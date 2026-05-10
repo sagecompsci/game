@@ -1,0 +1,19 @@
+{
+    "name": "Weak Weed",
+    "description": "Their stubborn roots reach far into the ground. Their attacks tickle more than they hurt.",
+    "health": 2,
+    "defense": 0,
+    "strength": 1,
+    "attack_speed": 1,
+    "speed": 0,
+    "attack_range": 1,
+    "territory": 0,
+    "combat_range": 1,
+    "stats": {
+        "health": 0.25
+    },
+    "drops": {},
+    "locations": [
+        "Everywhere under the open sky."
+    ]
+}

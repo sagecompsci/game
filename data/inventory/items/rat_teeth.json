@@ -1,0 +1,12 @@
+{
+    "name": "Rat Teeth",
+    "description": "The teeth of a rat.",
+    "uses": [
+        "craft"
+    ],
+    "locations": [
+        "drops: rat_weak"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

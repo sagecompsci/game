@@ -1,0 +1,12 @@
+{
+    "name": "Leaf",
+    "description": "A leaf that was growing on a stump.",
+    "uses": [
+        "crafting"
+    ],
+    "locations": [
+        "drops: stumpling"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

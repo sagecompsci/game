@@ -1,0 +1,12 @@
+{
+    "name": "Bluebird Feet",
+    "description": "The feet of a bluebird.",
+    "uses": [
+        "crafting"
+    ],
+    "locations": [
+        "drops: bluebird"
+    ],
+    "type": "items",
+    "inventory": "items"
+}

@@ -38,12 +38,17 @@ data
         items
         consumables
         special
-        quest?
+        quest items? or just put in special
+
+    gold should go in inventory dict
+
+    Recipes
     Quests
         - 1
         - 2
         - 3
     Npcs
+
 
 
 one? file for ui data
